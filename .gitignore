@@ -12,3 +12,9 @@ dist/
 # Audit/QA screenshots (transient)
 /audit-*.jpeg
 /audit-*.png
+
+# Visual QA screenshots (transient)
+/seminaria-*.jpeg
+/seminaria-*.png
+/qa-*.jpeg
+/qa-*.png
