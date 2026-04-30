@@ -1,0 +1,47 @@
+---
+// web/src/components/layout/Footer.astro
+import { primaryNav, phone } from '../../lib/nav';
+const year = new Date().getFullYear();
+---
+<footer class="bg-ink-strong text-white mt-24">
+  <div class="container-x py-16 md:py-20 grid gap-10 md:grid-cols-12">
+    <div class="md:col-span-5">
+      <div class="flex items-center gap-3">
+        <img src="/logo.svg" alt="" width="56" height="56" class="h-14 w-14 bg-white rounded-full p-1" />
+        <div>
+          <p class="font-display font-bold uppercase text-white tracking-tight">First Aid Academy</p>
+          <p class="text-white/70 text-sm">Σπύρος Τζιρτζιλάκης — Πιστοποιημένος Εκπαιδευτής RTI / ERC</p>
+        </div>
+      </div>
+      <p class="mt-6 text-white/80 leading-relaxed max-w-md">
+        Σεμινάρια Πρώτων Βοηθειών για ιδιώτες, γονείς και επιχειρήσεις, βασισμένα στα διεθνή πρωτόκολλα του European Resuscitation Council.
+      </p>
+    </div>
+
+    <div class="md:col-span-3">
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-white/60">Πλοήγηση</h3>
+      <ul class="mt-4 space-y-2">
+        {primaryNav.map((item) => (
+          <li><a href={item.href} class="text-white/85 hover:text-white no-underline">{item.label}</a></li>
+        ))}
+        <li><a href="/kratisi/" class="text-white/85 hover:text-white no-underline">Κράτηση</a></li>
+      </ul>
+    </div>
+
+    <div class="md:col-span-4">
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-white/60">Επικοινωνία</h3>
+      <ul class="mt-4 space-y-3 text-white/85">
+        <li><a href={`tel:${phone.tel}`} class="hover:text-white no-underline">{phone.display}</a></li>
+        <li><a href={`mailto:${phone.email}`} class="hover:text-white no-underline">{phone.email}</a></li>
+        <li class="text-white/70 text-sm">Σεμινάρια σε όλη την Ελλάδα · Ενδοεπιχειρησιακά κατόπιν συνεννόησης</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="border-t border-white/10">
+    <div class="container-x py-6 flex flex-col md:flex-row gap-3 justify-between text-white/60 text-sm">
+      <p>© {year} First Aid Academy. Όλα τα δικαιώματα διατηρούνται.</p>
+      <p>Πιστοποιήσεις: ERC · RTI · Πολιτική Προστασία</p>
+    </div>
+  </div>
+</footer>

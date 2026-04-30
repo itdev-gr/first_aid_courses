@@ -1,20 +1,9 @@
 ---
-import '../styles/global.css';
-import Reveal from '../components/motion/Reveal.astro';
-import HeroSplit from '../components/motion/HeroSplit.astro';
+import PageLayout from '../layouts/PageLayout.astro';
 ---
-<html lang="el">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>First Aid Academy</title>
-  </head>
-  <body class="container-x py-24 text-ink">
-    <HeroSplit text="ΓΝΩΣΗ ΠΟΥ ΣΩΖΕΙ ΖΩΕΣ" as="h1" className="font-display font-bold text-5xl text-crimson uppercase" />
-    <Reveal>
-      <p class="mt-8 text-ink">Πρώτη γραμμή.</p>
-      <p class="mt-2 text-ink">Δεύτερη γραμμή.</p>
-      <p class="mt-2 text-ink">Τρίτη γραμμή.</p>
-    </Reveal>
-  </body>
-</html>
+<PageLayout title="First Aid Academy" description="Σεμινάρια Πρώτων Βοηθειών από πιστοποιημένο εκπαιδευτή. Κρατήστε τη θέση σας σήμερα.">
+  <section class="container-x py-24">
+    <h1 class="font-display font-bold uppercase text-crimson text-5xl">Welcome scaffold</h1>
+    <p class="mt-4 text-ink">Header + Footer should render around this.</p>
+  </section>
+</PageLayout>
