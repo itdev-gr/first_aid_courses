@@ -20,6 +20,9 @@ import Button from '../ui/Button.astro';
     <p class="font-display font-semibold uppercase tracking-[0.2em] text-cyan-50/90 text-xs md:text-sm">
       First Aid Academy · Πιστοποιημένος Εκπαιδευτής RTI / ERC
     </p>
+    <svg class="pulse-line block w-32 md:w-40 h-6 mt-4" viewBox="0 0 200 24" fill="none" stroke="#D7263D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M0 12 H40 L50 4 L60 20 L72 8 L84 16 L96 12 H200" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" />
+    </svg>
     <HeroSplit
       text="ΓΝΩΣΗ ΠΟΥ ΣΩΖΕΙ ΖΩΕΣ"
       as="h1"
@@ -44,3 +47,13 @@ import Button from '../ui/Button.astro';
     </ul>
   </div>
 </section>
+
+<script>
+  import { gsap, prefersReducedMotion } from '../../lib/motion';
+  const path = document.querySelector<SVGPathElement>('.pulse-line path');
+  if (path && !prefersReducedMotion()) {
+    gsap.to(path, { strokeDashoffset: 0, duration: 1.2, ease: 'power2.inOut', delay: 0.2 });
+  } else if (path) {
+    path.setAttribute('stroke-dashoffset', '0');
+  }
+</script>
