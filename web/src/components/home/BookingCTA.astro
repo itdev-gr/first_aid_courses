@@ -1,0 +1,26 @@
+---
+import Section from '../layout/Section.astro';
+import Button from '../ui/Button.astro';
+import { phone } from '../../lib/nav';
+---
+<Section tone="crimson">
+  <div class="grid md:grid-cols-12 items-center gap-8">
+    <div class="md:col-span-8">
+      <h2 class="font-display font-bold uppercase text-white text-3xl md:text-4xl lg:text-5xl leading-[1.05]">
+        Έτοιμοι να μάθετε να σώζετε ζωές;
+      </h2>
+      <p class="mt-4 text-white/90 text-lg max-w-2xl">
+        Κρατήστε σήμερα τη θέση σας ή τηλεφωνήστε για προσωπική ενημέρωση. Η επόμενη
+        ομαδική εκπαίδευση είναι πάντα στη γωνία.
+      </p>
+    </div>
+    <div class="md:col-span-4 flex flex-col gap-3 md:items-end">
+      <Button href="/kratisi/" variant="primary" size="lg" className="bg-white !text-crimson hover:bg-white/90">
+        Κάντε Κράτηση
+      </Button>
+      <a href={`tel:${phone.tel}`} class="text-white/85 hover:text-white font-semibold no-underline">
+        ή τηλεφωνήστε στο {phone.display}
+      </a>
+    </div>
+  </div>
+</Section>
