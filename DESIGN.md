@@ -151,23 +151,23 @@ The original is mostly **flat full-width sections** — there's no real "card" p
   - Surface: `#FFFFFF`
   - Border: 1px `#E9E9E9` all sides, `rounded-md` (5px)
   - Padding: `12px 16px`
-  - Focus: border `#007D7E`, 3px focus ring `rgba(0,125,126,0.2)`
+  - Focus: border `#D7263D`, 3px focus ring `rgba(215,38,61,0.20)`
   - Placeholder: `#767676`, Open Sans 400
 - **Search input** in nav: minimal — no border, just an icon and a 14px text field; preserve the source's lightweight feel.
 
 ### Navigation
 
 - **Top header**: tall, generous (~137px on desktop on source — feel free to tighten to ~88–96px). White surface, sticky behavior with a soft `0 1px 2px rgba(0,0,0,0.04)` shadow appearing only on scroll.
-- **Nav links**: Open Sans 600, 14px, UPPERCASE for primary nav OR Title Case in `#333333` (the source uses Title Case). Hover/active: color shifts to `#007D7E`. No underline.
-- **Phone/contact strip** above nav: Lato or Open Sans 13–14px, `#767676`, with phone number in `#333333`.
+- **Nav links**: Open Sans 600, 14px, UPPERCASE for primary nav OR Title Case in `#3B4754` (the source uses Title Case). Hover/active: color shifts to `#D7263D`. No underline.
+- **Phone/contact strip** above nav: Lato or Open Sans 13–14px, `#6B7785`, with phone number in `#1F2933`.
 - **Mobile**: off-canvas drawer, white surface, full-height. Animate in via GSAP from the right.
 
 ### Footer
 
-- Surface: `#242424` (Footer Obsidian) — *the only place* dark surface is used.
+- Surface: `#0F1A24` (Footer Obsidian) — *the only place* dark surface is used.
 - Text: `#FFFFFF` for headings, `rgba(255,255,255,0.8)` for body, `rgba(255,255,255,0.6)` for legal/copyright.
 - Generous padding `64px 0` desktop, `48px 0` mobile.
-- Brand teal used sparingly — only for hover states on links and divider accents.
+- Pulse Crimson used sparingly — only for hover states on links and divider accents.
 
 ### Imagery
 
@@ -248,7 +248,7 @@ gsap.defaults({ duration: reduce ? 0 : 0.8, ease: 'power2.out' });
 
 This is a healthcare site serving an older demographic. Build in these guarantees from day one:
 
-- **Contrast**: Brand teal `#007D7E` on white passes AA for large text (4.7:1) but is **borderline** for body (under 4.5:1). Never use teal for body copy. For primary CTA white-on-teal: 4.7:1 — safe.
+- **Contrast**: Pulse Crimson `#D7263D` on white passes AA for large text and ≥18.66px bold UI but is **borderline** for body (~4.4:1). Never use crimson for body copy — use `#1F2933` (Charcoal Ink). For primary CTA white-on-crimson: 4.6:1 — safe. For small red labels, use `#A81B30` (Crimson Deep). Clinical Cyan `#1FB6E0` does not pass AA on white for text — use `#0E7DA1` (Cyan Deep).
 - **Min font size**: 16px for body on mobile (Tailwind `text-base`). The source's 14px is too small.
 - **Tap targets**: minimum 44×44px on mobile.
 - **Focus states**: visible, 3px brand-teal ring with 2px white offset on every interactive element.
