@@ -1,0 +1,18 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import Section from '../components/layout/Section.astro';
+import Button from '../components/ui/Button.astro';
+---
+<PageLayout title="Η σελίδα δεν βρέθηκε" description="Δυστυχώς η σελίδα που ψάχνετε δεν υπάρχει. Επιστρέψτε στην αρχική ή εξερευνήστε τα σεμινάριά μας." noindex>
+  <Section tone="default" pad="lg">
+    <div class="max-w-xl mx-auto text-center">
+      <p class="font-display font-bold text-crimson text-7xl">404</p>
+      <h1 class="mt-4 text-3xl md:text-4xl font-display font-semibold text-ink-strong">Η σελίδα δεν βρέθηκε</h1>
+      <p class="mt-4 text-ink-muted text-lg">Δοκιμάστε ξανά από την αρχική ή δείτε τη λίστα σεμιναρίων.</p>
+      <div class="mt-8 flex justify-center gap-3">
+        <Button href="/" variant="primary">Αρχική</Button>
+        <Button href="/seminaria/" variant="secondary">Σεμινάρια</Button>
+      </div>
+    </div>
+  </Section>
+</PageLayout>
