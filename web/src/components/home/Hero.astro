@@ -1,0 +1,46 @@
+---
+import { Image } from 'astro:assets';
+import heroImg from '../../assets/hero/home-hero.jpg';
+import HeroSplit from '../motion/HeroSplit.astro';
+import Button from '../ui/Button.astro';
+---
+<section class="relative isolate overflow-hidden bg-ink-strong text-white">
+  <Image
+    src={heroImg}
+    alt=""
+    widths={[768, 1280, 1920, 2400]}
+    sizes="100vw"
+    class="absolute inset-0 -z-10 h-full w-full object-cover opacity-80"
+    loading="eager"
+    fetchpriority="high"
+  />
+  <div class="absolute inset-0 -z-10 bg-gradient-to-br from-ink-strong/85 via-ink-strong/65 to-crimson/45"></div>
+
+  <div class="container-x py-24 md:py-32 lg:py-40 relative">
+    <p class="font-display font-semibold uppercase tracking-[0.2em] text-cyan-50/90 text-xs md:text-sm">
+      First Aid Academy · Πιστοποιημένος Εκπαιδευτής RTI / ERC
+    </p>
+    <HeroSplit
+      text="ΓΝΩΣΗ ΠΟΥ ΣΩΖΕΙ ΖΩΕΣ"
+      as="h1"
+      className="mt-6 font-display font-bold uppercase text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[0.95] tracking-tight max-w-4xl"
+    />
+    <p class="mt-6 text-white/85 text-lg md:text-xl max-w-2xl leading-relaxed">
+      Σεμινάρια Πρώτων Βοηθειών σχεδιασμένα από εκπαιδευτή με εμπειρία πεδίου σε
+      Πολιτική Προστασία και Πολεμική Αεροπορία. Για ιδιώτες, γονείς και επιχειρήσεις.
+    </p>
+    <div class="mt-10 flex flex-col sm:flex-row gap-3">
+      <Button href="/kratisi/" variant="primary" size="lg">Κράτηση Σεμιναρίου</Button>
+      <Button href="/seminaria/" variant="secondary" size="lg" className="bg-white/10 border-white/40 text-white hover:bg-white/20 ring-0">
+        Δείτε όλα τα σεμινάρια
+      </Button>
+    </div>
+
+    <ul class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl">
+      <li class="border-t border-white/15 pt-3"><span class="block font-display font-bold text-2xl text-white">8</span><span class="text-white/70 text-sm">Πιστοποιημένα σεμινάρια</span></li>
+      <li class="border-t border-white/15 pt-3"><span class="block font-display font-bold text-2xl text-white">21+</span><span class="text-white/70 text-sm">Εταιρείες πελάτες</span></li>
+      <li class="border-t border-white/15 pt-3"><span class="block font-display font-bold text-2xl text-white">ERC</span><span class="text-white/70 text-sm">Διεθνή πρωτόκολλα</span></li>
+      <li class="border-t border-white/15 pt-3"><span class="block font-display font-bold text-2xl text-white">2014</span><span class="text-white/70 text-sm">Από το</span></li>
+    </ul>
+  </div>
+</section>
