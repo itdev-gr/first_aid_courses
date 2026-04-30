@@ -1,0 +1,24 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import Section from '../../components/layout/Section.astro';
+import Button from '../../components/ui/Button.astro';
+import { phone } from '../../lib/nav';
+---
+<PageLayout title="Λάβαμε το αίτημά σας" description="Ευχαριστούμε για το αίτημα κράτησης. Θα επικοινωνήσουμε σύντομα." noindex>
+  <Section tone="default" pad="lg">
+    <div class="max-w-2xl mx-auto text-center">
+      <div class="mx-auto h-16 w-16 rounded-full bg-surface-crimson flex items-center justify-center text-crimson">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h1 class="mt-6 font-display font-bold text-crimson text-3xl md:text-4xl">Ευχαριστούμε — λάβαμε το αίτημά σας</h1>
+      <p class="mt-4 text-ink-muted text-lg leading-relaxed">
+        Θα επικοινωνήσουμε μαζί σας εντός 24 ωρών για να επιβεβαιώσουμε τις λεπτομέρειες
+        της κράτησής σας. Αν χρειάζεστε άμεση απάντηση, καλέστε μας απευθείας.
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <Button href="/" variant="primary">Επιστροφή στην αρχική</Button>
+        <Button href={`tel:${phone.tel}`} variant="secondary">Καλέστε μας</Button>
+      </div>
+    </div>
+  </Section>
+</PageLayout>
