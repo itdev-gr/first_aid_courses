@@ -1,0 +1,23 @@
+---
+// web/src/components/layout/Section.astro
+interface Props {
+  tone?: 'default' | 'soft' | 'cyan' | 'crimson' | 'dark';
+  pad?: 'sm' | 'md' | 'lg';
+  id?: string;
+  className?: string;
+}
+const { tone = 'default', pad = 'lg', id, className = '' } = Astro.props;
+const tones = {
+  default: 'bg-white text-ink',
+  soft:    'bg-surface-soft text-ink',
+  cyan:    'bg-surface-cyan text-ink',
+  crimson: 'bg-crimson text-white',
+  dark:    'bg-ink-strong text-white',
+};
+const pads = { sm: 'py-12 md:py-16', md: 'py-16 md:py-20', lg: 'py-16 md:py-24' };
+---
+<section id={id} class={`${tones[tone]} ${pads[pad]} ${className}`}>
+  <div class="container-x">
+    <slot />
+  </div>
+</section>

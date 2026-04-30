@@ -1,0 +1,18 @@
+---
+// web/src/components/ui/Tag.astro
+interface Props {
+  variant?: 'crimson' | 'cyan' | 'neutral';
+  size?: 'sm' | 'md';
+  className?: string;
+}
+const { variant = 'neutral', size = 'sm', className = '' } = Astro.props;
+const sizes = { sm: 'text-xs px-2.5 py-1', md: 'text-sm px-3 py-1.5' };
+const variants = {
+  crimson: 'bg-surface-crimson text-crimson-700',
+  cyan:    'bg-surface-cyan text-cyan-700',
+  neutral: 'bg-surface-soft text-ink-edge',
+};
+---
+<span class={`inline-flex items-center gap-1.5 rounded-full font-semibold ${sizes[size]} ${variants[variant]} ${className}`}>
+  <slot />
+</span>
