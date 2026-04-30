@@ -1,0 +1,14 @@
+---
+import Button from '../ui/Button.astro';
+import { phone } from '../../lib/nav';
+interface Props { slug: string; titleEl: string; }
+const { slug, titleEl } = Astro.props;
+---
+<aside class="bg-surface-cyan border border-cyan/20 rounded-3xl p-6 md:p-8">
+  <h3 class="font-display font-bold text-crimson text-2xl">Έτοιμοι για συμμετοχή;</h3>
+  <p class="mt-2 text-ink leading-relaxed">Κρατήστε τη θέση σας στο επόμενο σεμινάριο "{titleEl}" ή ζητήστε ιδιωτική εκπαίδευση.</p>
+  <div class="mt-6 flex flex-col gap-3">
+    <Button href={`/kratisi/?program=${slug}`} variant="primary">Κάντε κράτηση</Button>
+    <a href={`tel:${phone.tel}`} class="text-cyan-700 font-semibold no-underline">ή τηλεφωνήστε στο {phone.display}</a>
+  </div>
+</aside>

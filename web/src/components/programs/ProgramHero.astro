@@ -1,0 +1,40 @@
+---
+import { Image } from 'astro:assets';
+import DurationBadge from './DurationBadge.astro';
+import Tag from '../ui/Tag.astro';
+import Button from '../ui/Button.astro';
+interface Props {
+  code: string;
+  titleEl: string;
+  summary: string;
+  durationHours: string;
+  audience: string;
+  prerequisite?: string;
+  heroImage: any;
+  slug: string;
+}
+const { code, titleEl, summary, durationHours, audience, prerequisite, heroImage, slug } = Astro.props;
+const audienceLabel = { individual: 'Ιδιώτες', business: 'Επιχειρήσεις', parent: 'Γονείς' }[audience] ?? audience;
+---
+<section class="relative isolate bg-ink-strong text-white overflow-hidden">
+  <Image src={heroImage} alt="" widths={[768, 1280, 1920]} sizes="100vw" class="absolute inset-0 -z-10 h-full w-full object-cover opacity-70" loading="eager" fetchpriority="high" />
+  <div class="absolute inset-0 -z-10 bg-gradient-to-br from-ink-strong/85 via-ink-strong/60 to-crimson/40"></div>
+  <div class="container-x py-20 md:py-28">
+    <div class="flex flex-wrap items-center gap-2 text-sm">
+      <span class="inline-flex items-center bg-white text-crimson font-bold tracking-wide text-xs px-2.5 py-1 rounded">{code}</span>
+      <Tag variant="cyan">{audienceLabel}</Tag>
+      <DurationBadge hours={durationHours} />
+    </div>
+    <h1 class="mt-6 font-display font-bold uppercase text-white text-3xl md:text-5xl leading-[1.05] tracking-tight max-w-4xl">{titleEl}</h1>
+    <p class="mt-6 text-white/85 text-lg max-w-3xl leading-relaxed">{summary}</p>
+    {prerequisite && (
+      <p class="mt-4 text-cyan-50 text-sm">
+        <strong class="font-semibold">Προαπαιτούμενο:</strong> {prerequisite}
+      </p>
+    )}
+    <div class="mt-8 flex flex-wrap gap-3">
+      <Button href={`/kratisi/?program=${slug}`} variant="primary" size="lg">Κάντε κράτηση γι' αυτό το σεμινάριο</Button>
+      <Button href="/epikoinonia/" variant="secondary" size="lg" className="bg-white/10 border-white/40 text-white hover:bg-white/20 ring-0">Επικοινωνήστε</Button>
+    </div>
+  </div>
+</section>
