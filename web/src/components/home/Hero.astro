@@ -52,7 +52,7 @@ import Button from '../ui/Button.astro';
   import { gsap, prefersReducedMotion } from '../../lib/motion';
   const path = document.querySelector<SVGPathElement>('.pulse-line path');
   if (path && !prefersReducedMotion()) {
-    gsap.to(path, { strokeDashoffset: 0, duration: 1.2, ease: 'power2.inOut', delay: 0.2 });
+    gsap.to(path, { attr: { 'stroke-dashoffset': 0 }, duration: 1.2, ease: 'power2.inOut', delay: 0.2 });
   } else if (path) {
     path.setAttribute('stroke-dashoffset', '0');
   }

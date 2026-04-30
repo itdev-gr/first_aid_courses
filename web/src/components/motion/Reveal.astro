@@ -5,10 +5,10 @@ interface Props {
   stagger?: number;
   y?: number;
   delay?: number;
-  /** child selector to animate; default: > * */
+  /** child selector to animate; default: :scope > * */
   selector?: string;
 }
-const { stagger = 0.08, y = 24, delay = 0, selector = '> *' } = Astro.props;
+const { stagger = 0.08, y = 24, delay = 0, selector = ':scope > *' } = Astro.props;
 ---
 <div data-reveal data-stagger={stagger} data-y={y} data-delay={delay} data-selector={selector}>
   <slot />
@@ -22,7 +22,7 @@ const { stagger = 0.08, y = 24, delay = 0, selector = '> *' } = Astro.props;
     const stagger = parseFloat(el.dataset.stagger ?? '0.08');
     const y       = parseFloat(el.dataset.y ?? '24');
     const delay   = parseFloat(el.dataset.delay ?? '0');
-    const selector = el.dataset.selector ?? '> *';
+    const selector = el.dataset.selector ?? ':scope > *';
     const targets = el.querySelectorAll<HTMLElement>(selector);
 
     if (prefersReducedMotion()) {
