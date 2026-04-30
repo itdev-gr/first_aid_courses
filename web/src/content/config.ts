@@ -2,8 +2,7 @@ import { defineCollection, z } from 'astro:content';
 
 const programs = defineCollection({
   type: 'content',
-  schema: ({ image }) => z.object({
-    slug:        z.string(),
+  schema: z.object({
     code:        z.string(),
     titleEl:     z.string(),
     titleEn:     z.string(),
@@ -16,8 +15,8 @@ const programs = defineCollection({
     prerequisite: z.string().optional(),
     theory:     z.array(z.string()),
     skills:     z.array(z.string()),
-    heroImage:  image(),
-    galleryImages: z.array(image()).default([]),
+    heroImage:  z.string(),
+    galleryImages: z.array(z.string()).default([]),
     tags:       z.array(z.string()).default([]),
     order:      z.number().default(99),
     featured:   z.boolean().default(false),
