@@ -1,0 +1,41 @@
+---
+// web/src/components/motion/Reveal.astro
+// Wrap any block; on scroll-into-view, fade + rise its direct children with stagger.
+interface Props {
+  stagger?: number;
+  y?: number;
+  delay?: number;
+  /** child selector to animate; default: > * */
+  selector?: string;
+}
+const { stagger = 0.08, y = 24, delay = 0, selector = '> *' } = Astro.props;
+---
+<div data-reveal data-stagger={stagger} data-y={y} data-delay={delay} data-selector={selector}>
+  <slot />
+</div>
+
+<script>
+  import { gsap, ScrollTrigger, prefersReducedMotion } from '../../lib/motion';
+
+  const els = document.querySelectorAll<HTMLElement>('[data-reveal]');
+  els.forEach((el) => {
+    const stagger = parseFloat(el.dataset.stagger ?? '0.08');
+    const y       = parseFloat(el.dataset.y ?? '24');
+    const delay   = parseFloat(el.dataset.delay ?? '0');
+    const selector = el.dataset.selector ?? '> *';
+    const targets = el.querySelectorAll<HTMLElement>(selector);
+
+    if (prefersReducedMotion()) {
+      targets.forEach((t) => { t.style.opacity = '1'; t.style.transform = 'none'; });
+      return;
+    }
+
+    gsap.set(targets, { opacity: 0, y });
+    ScrollTrigger.create({
+      trigger: el,
+      start: 'top 80%',
+      once: true,
+      onEnter: () => gsap.to(targets, { opacity: 1, y: 0, stagger, delay }),
+    });
+  });
+</script>

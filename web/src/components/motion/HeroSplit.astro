@@ -1,0 +1,30 @@
+---
+// web/src/components/motion/HeroSplit.astro
+// Word-by-word headline reveal (no SplitText/Club required).
+interface Props {
+  text: string;
+  as?: 'h1' | 'h2';
+  className?: string;
+}
+const { text, as: Tag = 'h1', className = '' } = Astro.props;
+const words = text.split(/\s+/);
+---
+<Tag class={`hero-split ${className}`} data-hero-split>
+  {words.map((w, i) => (
+    <span class="inline-block overflow-hidden align-bottom">
+      <span class="inline-block translate-y-[110%]" data-hero-word>{w}</span>
+    </span>
+  )).reduce((acc: any[], el, i) => i === 0 ? [el] : [...acc, ' ', el], [])}
+</Tag>
+
+<script>
+  import { gsap, prefersReducedMotion } from '../../lib/motion';
+  document.querySelectorAll<HTMLElement>('[data-hero-split]').forEach((root) => {
+    const words = root.querySelectorAll<HTMLElement>('[data-hero-word]');
+    if (prefersReducedMotion()) {
+      words.forEach((w) => (w.style.transform = 'translateY(0)'));
+      return;
+    }
+    gsap.to(words, { y: 0, duration: 0.9, ease: 'power3.out', stagger: 0.05, delay: 0.1 });
+  });
+</script>
