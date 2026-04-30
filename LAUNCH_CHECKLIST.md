@@ -10,10 +10,26 @@
 - [ ] Confirm the FAW MDX content matches Spyros's actual training scope (raw `.odt` for FAW was unreadable — current content is synthesized to align with RTI's standard 18-hour First Aid at Work curriculum)
 - [ ] Final pricing strategy: decide whether to display prices on program detail pages or keep "request quote" only (current site uses request-quote)
 
-## Technical
-- [ ] DNS → Netlify
+## Deploy (pick one host)
+
+### Vercel (recommended — `web/vercel.json` configured)
+- [ ] In Vercel dashboard → Import Project → connect this repo
+- [ ] Set **Root Directory** to `web` (Astro project lives in a subfolder)
+- [ ] Framework Preset auto-detects as **Astro**
+- [ ] Build Command: `npm run build` · Output: `dist` (already set in `vercel.json`)
+- [ ] Add custom domain in Project Settings → Domains
+- [ ] Vercel does NOT have built-in form handling — choose one **before launch**:
+  - Formspree (free tier; change form `action` to Formspree endpoint)
+  - Web3Forms (free; same pattern)
+  - Vercel Serverless Function (write `api/booking.ts` + add `@astrojs/vercel` adapter; switch to SSR)
+  - **Until a handler is wired, the booking & contact forms will POST to dead URLs** — block launch on this.
+
+### Netlify (alternative — `web/netlify.toml` + `web/public/_redirects` configured)
+- [ ] Netlify auto-detects from `netlify.toml`
+- [ ] Netlify Forms work out-of-the-box: "booking" + "contact" appear in dashboard after first deploy
+
+## Technical (both hosts)
 - [ ] HTTPS certificate active
-- [ ] Netlify Forms enabled in site settings; "booking" + "contact" forms appear in dashboard after first deploy
 - [ ] Test booking form end-to-end (submit + confirm email arrives)
 - [ ] Test contact form end-to-end (submit + ?sent=1 banner shows on return)
 - [ ] Verify favicon, apple-touch-icon, og-default render across browsers/devices
