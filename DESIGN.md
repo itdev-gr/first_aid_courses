@@ -8,9 +8,9 @@
 
 ## 1. Visual Theme & Atmosphere
 
-A **calm, clinically-confident, professionally-warm** identity. The aesthetic is *understated medical hospitality* — the page should feel like the waiting area of a private clinic, not a tech startup: airy whitespace, generous use of pale teal-tinted sections, full-bleed imagery of caregivers in real settings, and a single confident accent color carrying every interaction.
+A **calm, clinically-confident, professionally-warm** identity. The aesthetic is *understated medical hospitality* — the page should feel like the waiting area of a private clinic, not a tech startup: airy whitespace, generous use of pale cyan-tinted sections, full-bleed imagery of training in real settings, and a confident two-color accent system (crimson + cyan) carrying every interaction.
 
-Density is **measured and unhurried** — paragraphs breathe, sections separate cleanly with soft pale-teal washes, and there are no busy decorative flourishes. The mood adjectives that should guide every decision: **trustworthy, reassuring, dignified, accessible, human**.
+Density is **measured and unhurried** — paragraphs breathe, sections separate cleanly with soft cyan or crimson washes, and there are no busy decorative flourishes. The mood adjectives that should guide every decision: **trustworthy, reassuring, dignified, accessible, human, life-affirming**.
 
 When porting to Astro + Tailwind + GSAP, the goal is to preserve this calm professionalism while modernizing the typography rhythm, sharpening the spacing, and introducing motion that *whispers* rather than performs (the original site is mostly static — a tasteful restraint we should honor).
 
@@ -98,12 +98,12 @@ The system uses a **three-typeface stack**, each with a distinct job — never o
 | Role | Family | Weight | Size | Line | Case | Color |
 |---|---|---|---|---|---|---|
 | **Hero headline** (H1, image overlays) | Poppins | 700 | 38–48px | 48–56px | UPPERCASE | `#FFFFFF` over scrim |
-| **Section title** (H2) | Open Sans | 400 | 22–36px | 1.4 | Title Case | `#007D7E` (brand teal) |
-| **Subsection** (H3) | Open Sans | 600 | 18–22px | 1.4 | Title Case | `#333333` |
-| **Body** | Open Sans | 400 | 14–16px | 1.6 | Sentence | `#333333` |
-| **Callout / phone block** | Lato | 400 | 17px | 1.6 | Mixed | `#777777` |
-| **Nav link / button label** | Open Sans | 600 | 13–14px | 1.2 | UPPERCASE for utility, sentence for primary | `#3E3E3E` / white |
-| **Caption / meta** | Open Sans | 400 | 12–13px | 1.4 | Sentence | `#767676` |
+| **Section title** (H2) | Open Sans | 400 | 22–36px | 1.4 | Title Case | `#D7263D` (Pulse Crimson) |
+| **Subsection** (H3) | Open Sans | 600 | 18–22px | 1.4 | Title Case | `#0F1A24` (Footer Obsidian, used as ink-strong) |
+| **Body** | Open Sans | 400 | 14–16px | 1.6 | Sentence | `#1F2933` (Charcoal Ink) |
+| **Callout / phone block** | Lato | 400 | 17px | 1.6 | Mixed | `#6B7785` (Slate Mute) |
+| **Nav link / button label** | Open Sans | 600 | 13–14px | 1.2 | UPPERCASE for utility, sentence for primary | `#3B4754` (Graphite Edge) / white |
+| **Caption / meta** | Open Sans | 400 | 12–13px | 1.4 | Sentence | `#6B7785` |
 
 ### Letter-spacing & tracking
 
@@ -112,7 +112,7 @@ The system uses a **three-typeface stack**, each with a distinct job — never o
 
 ### Hierarchy principle
 
-Color, not size, carries hierarchy. **Brand teal H2s** are the strongest signal on any non-hero section — keep them at 22–28px and let the teal do the heavy lifting. Resist the impulse to scale headings up to grab attention.
+Color, not size, carries hierarchy. **Pulse Crimson H2s** are the strongest signal on any non-hero section — keep them at 22–28px and let the crimson do the heavy lifting. Resist the impulse to scale headings up to grab attention.
 
 ---
 
