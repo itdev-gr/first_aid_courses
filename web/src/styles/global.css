@@ -1,0 +1,57 @@
+/* web/src/styles/global.css */
+@import '@fontsource-variable/open-sans/index.css';
+@import '@fontsource/poppins/400.css';
+@import '@fontsource/poppins/600.css';
+@import '@fontsource/poppins/700.css';
+@import '@fontsource/lato/400.css';
+@import '@fontsource/lato/700.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply font-sans text-ink bg-white;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  h1, h2, h3, h4 {
+    @apply font-sans;
+    text-wrap: balance;
+  }
+  a {
+    @apply text-cyan-600 underline-offset-4 hover:underline;
+  }
+  ::selection {
+    background: #FDECEE;
+    color: #831322;
+  }
+  :focus-visible {
+    outline: 3px solid #D7263D;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+@layer components {
+  .container-x {
+    @apply mx-auto max-w-content px-4 md:px-6 lg:px-8;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
