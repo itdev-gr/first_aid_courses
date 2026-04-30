@@ -1,0 +1,50 @@
+---
+// web/src/layouts/BaseLayout.astro
+import '../styles/global.css';
+import { siteName, siteUrl, defaultOg, buildTitle } from '../lib/seo';
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  noindex?: boolean;
+  canonical?: string;
+}
+const {
+  title,
+  description,
+  ogImage = defaultOg,
+  noindex = false,
+  canonical = Astro.url.pathname,
+} = Astro.props;
+const fullTitle = buildTitle(title);
+const canonUrl  = new URL(canonical, siteUrl).toString();
+const ogUrl     = new URL(ogImage, siteUrl).toString();
+---
+<!doctype html>
+<html lang="el">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonUrl} />
+    {noindex && <meta name="robots" content="noindex,nofollow" />}
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonUrl} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:locale" content="el_GR" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#D7263D" />
+  </head>
+  <body class="bg-white text-ink min-h-screen flex flex-col">
+    <slot />
+  </body>
+</html>
