@@ -1,0 +1,59 @@
+---
+// web/src/components/layout/Header.astro
+import { primaryNav, ctaNav } from '../../lib/nav';
+import Button from '../ui/Button.astro';
+import PhoneLink from '../ui/PhoneLink.astro';
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
+---
+<header class="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-hairline">
+  <div class="container-x flex items-center justify-between gap-6 h-20 md:h-24">
+    <a href="/" class="flex items-center gap-3 no-underline" aria-label="First Aid Academy — Αρχική">
+      <img src="/logo.svg" alt="" width="48" height="48" class="h-12 w-12" />
+      <span class="hidden sm:flex flex-col leading-tight">
+        <span class="font-display font-bold uppercase text-crimson tracking-tight text-sm">First Aid</span>
+        <span class="font-display font-bold uppercase text-cyan-600 tracking-tight text-sm">Academy</span>
+      </span>
+    </a>
+
+    <nav class="hidden lg:flex items-center gap-1" aria-label="Κύρια πλοήγηση">
+      {primaryNav.map((item) => (
+        <a
+          href={item.href}
+          class={`px-3 py-2 text-sm font-semibold no-underline transition-out ${isActive(item.href) ? 'text-crimson' : 'text-ink-edge hover:text-crimson'}`}
+          aria-current={isActive(item.href) ? 'page' : undefined}
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="flex items-center gap-4">
+      <PhoneLink className="hidden md:inline-flex text-sm" />
+      <Button href={ctaNav.href} variant="primary" size="sm">{ctaNav.label}</Button>
+      <button id="mobile-menu-btn" class="lg:hidden p-2 -mr-2" aria-label="Άνοιγμα μενού" aria-expanded="false" aria-controls="mobile-menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="lg:hidden hidden border-t border-hairline bg-white">
+    <nav class="container-x py-4 flex flex-col gap-1" aria-label="Κινητή πλοήγηση">
+      {primaryNav.map((item) => (
+        <a href={item.href} class={`px-3 py-3 rounded text-base font-semibold no-underline ${isActive(item.href) ? 'bg-surface-crimson text-crimson' : 'text-ink-edge hover:bg-surface-soft'}`}>{item.label}</a>
+      ))}
+      <PhoneLink className="px-3 py-3" />
+    </nav>
+  </div>
+</header>
+
+<script>
+  const btn  = document.getElementById('mobile-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  btn?.addEventListener('click', () => {
+    const open = menu?.classList.toggle('hidden') === false;
+    btn.setAttribute('aria-expanded', String(open));
+    btn.setAttribute('aria-label', open ? 'Κλείσιμο μενού' : 'Άνοιγμα μενού');
+  });
+</script>

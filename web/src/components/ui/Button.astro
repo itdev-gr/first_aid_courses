@@ -1,0 +1,32 @@
+---
+// web/src/components/ui/Button.astro
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'secondary' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  type?: 'button' | 'submit';
+  className?: string;
+  ariaLabel?: string;
+}
+const {
+  href, variant = 'primary', size = 'md', type = 'button',
+  className = '', ariaLabel,
+} = Astro.props;
+
+const sizes = {
+  sm: 'text-sm px-4 py-2 rounded-md',
+  md: 'text-base px-5 py-3.5 rounded-md',
+  lg: 'text-base px-6 py-4 rounded-md',
+};
+const variants = {
+  primary:   'bg-crimson text-white hover:bg-crimson-600 hover:shadow-cta no-underline',
+  secondary: 'bg-white text-cyan-600 border border-cyan ring-1 ring-cyan/30 hover:bg-cyan-50 no-underline',
+  ghost:     'bg-transparent text-ink-edge hover:bg-surface-soft no-underline',
+};
+const cls = `inline-flex items-center justify-center font-semibold transition-out ${sizes[size]} ${variants[variant]} ${className}`;
+
+const Tag = href ? 'a' : 'button';
+---
+<Tag class={cls} href={href} type={!href ? type : undefined} aria-label={ariaLabel}>
+  <slot />
+</Tag>
