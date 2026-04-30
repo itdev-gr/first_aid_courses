@@ -1,9 +1,23 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
+import Hero from '../components/home/Hero.astro';
+import ValueProps from '../components/home/ValueProps.astro';
+import ProgramsTeaser from '../components/home/ProgramsTeaser.astro';
+import ForBusinesses from '../components/home/ForBusinesses.astro';
+import ClientsStrip from '../components/home/ClientsStrip.astro';
+import CredentialsBand from '../components/home/CredentialsBand.astro';
+import FounderTeaser from '../components/home/FounderTeaser.astro';
+import BookingCTA from '../components/home/BookingCTA.astro';
 ---
-<PageLayout title="First Aid Academy" description="Σεμινάρια Πρώτων Βοηθειών από πιστοποιημένο εκπαιδευτή. Κρατήστε τη θέση σας σήμερα.">
-  <section class="container-x py-24">
-    <h1 class="font-display font-bold uppercase text-crimson text-5xl">Welcome scaffold</h1>
-    <p class="mt-4 text-ink">Header + Footer should render around this.</p>
-  </section>
+<PageLayout
+  title="First Aid Academy"
+  description="Σεμινάρια Πρώτων Βοηθειών για ιδιώτες, γονείς και επιχειρήσεις. Πιστοποιημένος εκπαιδευτής RTI / ERC. Κρατήστε τη θέση σας σήμερα.">
+  <Hero />
+  <ValueProps />
+  <ProgramsTeaser />
+  <ForBusinesses />
+  <ClientsStrip />
+  <CredentialsBand />
+  <FounderTeaser />
+  <BookingCTA />
 </PageLayout>
