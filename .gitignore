@@ -1,0 +1,9 @@
+.DS_Store
+.playwright-mcp/
+node_modules/
+dist/
+.astro/
+.env
+.env.local
+*.log
+/tmp-extract/
