@@ -12,7 +12,7 @@ export const primaryNav: NavItem[] = [
   { label: 'Επικοινωνία',  href: '/epikoinonia/' },
 ];
 
-export const ctaNav: NavItem = { label: 'Κράτηση', href: '/kratisi/' };
+export const ctaNav: NavItem = { label: 'Πληροφορίες', href: '/kratisi/' };
 
 export const phone = {
   display: '+30 6900 000000',
