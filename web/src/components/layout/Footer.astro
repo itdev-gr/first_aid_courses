@@ -5,7 +5,7 @@ const year = new Date().getFullYear();
 ---
 <footer class="bg-ink-strong text-white mt-24">
   <div class="container-x py-16 md:py-20 grid gap-10 md:grid-cols-12">
-    <div class="md:col-span-5">
+    <div class="md:col-span-4">
       <div class="flex items-center gap-3">
         <img src="/logo.svg" alt="" width="56" height="56" class="h-14 w-14 bg-white rounded-full p-1" />
         <div>
@@ -28,12 +28,19 @@ const year = new Date().getFullYear();
       </ul>
     </div>
 
-    <div class="md:col-span-4">
+    <div class="md:col-span-3">
       <h3 class="text-sm font-semibold uppercase tracking-wider text-white/60">Επικοινωνία</h3>
       <ul class="mt-4 space-y-3 text-white/85">
         <li><a href={`tel:${phone.tel}`} class="hover:text-white no-underline">{phone.display}</a></li>
         <li><a href={`mailto:${phone.email}`} class="hover:text-white no-underline">{phone.email}</a></li>
         <li class="text-white/70 text-sm">Σεμινάρια σε όλη την Ελλάδα · Ενδοεπιχειρησιακά κατόπιν συνεννόησης</li>
+      </ul>
+    </div>
+
+    <div class="md:col-span-2">
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-white/60">Νομικά</h3>
+      <ul class="mt-4 space-y-2">
+        <li><a href="/politiki-aporritou/" class="text-white/85 hover:text-white no-underline">Πολιτική Απορρήτου</a></li>
       </ul>
     </div>
   </div>
