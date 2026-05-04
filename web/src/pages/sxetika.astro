@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import PageLayout from '../layouts/PageLayout.astro';
 import Section from '../components/layout/Section.astro';
 import Reveal from '../components/motion/Reveal.astro';
@@ -8,7 +8,13 @@ import Tag from '../components/ui/Tag.astro';
 import Button from '../components/ui/Button.astro';
 import founder from '../assets/brand/founder.png';
 
-const credentials = (await getCollection('credentials')).sort((a, b) => a.data.order - b.data.order);
+const credentialsRaw = (await getCollection('credentials')).sort((a, b) => a.data.order - b.data.order);
+const credentials = await Promise.all(
+  credentialsRaw.map(async (c) => ({
+    ...c,
+    fullSrc: (await getImage({ src: c.data.image, width: 1600 })).src,
+  })),
+);
 ---
 <PageLayout
   title="Σχετικά με τον Εκπαιδευτή"
@@ -84,17 +90,66 @@ const credentials = (await getCollection('credentials')).sort((a, b) => a.data.o
     <Reveal stagger={0.08}>
       <ul class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {credentials.map((c) => (
-          <li class="bg-white border border-hairline rounded-2xl overflow-hidden shadow-tile">
-            <div class="aspect-[4/3] bg-surface-soft overflow-hidden">
-              <Image src={c.data.image} alt={c.data.title} widths={[400, 600, 800]} sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw" class="h-full w-full object-cover" />
-            </div>
-            <div class="p-5">
-              <p class="font-semibold text-ink-strong leading-snug">{c.data.title}</p>
-              <p class="mt-1 text-ink-muted text-sm">{c.data.issuer}{c.data.yearIssued ? ` · ${c.data.yearIssued}` : ''}</p>
-            </div>
+          <li>
+            <button
+              type="button"
+              class="cert-thumb group block w-full text-left bg-white border border-hairline rounded-2xl overflow-hidden shadow-tile hover:shadow-tileHover hover:-translate-y-0.5 transition-out cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-crimson"
+              data-cert-src={c.fullSrc}
+              data-cert-alt={c.data.title}
+              aria-label={`Δείτε σε μεγέθυνση: ${c.data.title}`}
+            >
+              <div class="relative aspect-[4/3] bg-surface-soft overflow-hidden">
+                <Image src={c.data.image} alt={c.data.title} widths={[400, 600, 800]} sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw" class="h-full w-full object-cover" />
+                <span class="absolute top-3 right-3 inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/90 text-crimson opacity-0 group-hover:opacity-100 transition-out shadow-tile" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                </span>
+              </div>
+              <div class="p-5">
+                <p class="font-semibold text-ink-strong leading-snug">{c.data.title}</p>
+                <p class="mt-1 text-ink-muted text-sm">{c.data.issuer}{c.data.yearIssued ? ` · ${c.data.yearIssued}` : ''}</p>
+              </div>
+            </button>
           </li>
         ))}
       </ul>
     </Reveal>
   </Section>
+
+  <dialog id="cert-lightbox" class="cert-lightbox bg-transparent p-0 max-w-none max-h-none w-full h-full m-0 inset-0">
+    <div class="relative w-full h-full flex flex-col items-center justify-center p-4 md:p-10">
+      <button id="cert-lightbox-close" type="button" aria-label="Κλείσιμο" class="absolute top-4 right-4 md:top-6 md:right-6 w-11 h-11 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition-out backdrop-blur-sm">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <img id="cert-lightbox-img" src="" alt="" class="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl bg-white" />
+      <p id="cert-lightbox-caption" class="mt-4 text-white text-center font-semibold max-w-2xl px-4"></p>
+    </div>
+  </dialog>
+
+  <style is:global>
+    .cert-lightbox::backdrop { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(4px); }
+    .cert-lightbox[open] { display: flex; }
+  </style>
+
+  <script>
+    const dlg = document.getElementById('cert-lightbox') as HTMLDialogElement | null;
+    const dlgImg = document.getElementById('cert-lightbox-img') as HTMLImageElement | null;
+    const dlgCap = document.getElementById('cert-lightbox-caption');
+    const closeBtn = document.getElementById('cert-lightbox-close');
+
+    if (dlg && dlgImg && dlgCap && closeBtn) {
+      document.querySelectorAll<HTMLButtonElement>('.cert-thumb').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const src = btn.dataset.certSrc;
+          const alt = btn.dataset.certAlt ?? '';
+          if (!src) return;
+          dlgImg.src = src;
+          dlgImg.alt = alt;
+          dlgCap.textContent = alt;
+          dlg.showModal();
+        });
+      });
+      closeBtn.addEventListener('click', () => dlg.close());
+      dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+    }
+  </script>
 </PageLayout>
