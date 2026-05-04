@@ -38,13 +38,14 @@ const ctaHref = `/kratisi/?program=${entry.slug}`;
     )}
   </p>
 
-  {priceEur !== undefined && (
-    <p class="mt-6 font-display font-bold text-ink-strong text-2xl">
-      €{priceEur} <span class="text-base font-normal">/ άτομο</span>
-    </p>
-  )}
-
-  <Button href={ctaHref} variant="primary" size="md" className="mt-6">
-    Επιλογή Ημερομηνίας
-  </Button>
+  <div class="mt-auto w-full flex flex-col items-center pt-6">
+    {priceEur !== undefined && (
+      <p class="font-display font-bold text-ink-strong text-2xl">
+        €{priceEur} <span class="text-base font-normal">/ άτομο</span>
+      </p>
+    )}
+    <Button href={ctaHref} variant="primary" size="md" className="mt-6">
+      Επιλογή Ημερομηνίας
+    </Button>
+  </div>
 </article>
