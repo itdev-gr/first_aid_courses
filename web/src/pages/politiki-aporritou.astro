@@ -1,0 +1,74 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import Section from '../components/layout/Section.astro';
+
+const lastUpdated = '4 Μαΐου 2026';
+
+const sections = [
+  { id: 'ypefthynos',     title: '1. Υπεύθυνος επεξεργασίας' },
+  { id: 'dedomena',       title: '2. Ποια δεδομένα συλλέγουμε' },
+  { id: 'skopoi',         title: '3. Σκοποί και νομική βάση επεξεργασίας' },
+  { id: 'diatirisi',      title: '4. Χρόνος διατήρησης' },
+  { id: 'apodektes',      title: '5. Αποδέκτες — Εκτελούντες την επεξεργασία' },
+  { id: 'diethnis',       title: '6. Διαβίβαση εκτός ΕΟΧ' },
+  { id: 'dikaiomata',     title: '7. Τα δικαιώματά σας' },
+  { id: 'parapono',       title: '8. Δικαίωμα καταγγελίας στην Αρχή' },
+  { id: 'cookies',        title: '9. Cookies και τεχνολογίες παρακολούθησης' },
+  { id: 'asfaleia',       title: '10. Ασφάλεια δεδομένων' },
+  { id: 'anilikoi',       title: '11. Δεδομένα ανηλίκων' },
+  { id: 'tropopoiiseis',  title: '12. Τροποποιήσεις της παρούσας πολιτικής' },
+];
+---
+<!--
+  PRIVACY POLICY — placeholders to fill before publishing:
+  - [ ] Legal name of data controller in section 1
+  - [ ] ΑΦΜ / ΔΟΥ in section 1 (if applicable)
+  - [ ] Registered address in section 1
+  - [ ] Confirm cookies section (9) reflects current site
+-->
+<PageLayout
+  title="Πολιτική Απορρήτου"
+  description="Πολιτική απορρήτου της First Aid Academy — πώς συλλέγουμε, χρησιμοποιούμε και προστατεύουμε τα προσωπικά σας δεδομένα, σύμφωνα με τον GDPR και τον Ν. 4624/2019.">
+
+  <Section tone="default" pad="lg">
+    <div class="max-w-3xl">
+      <p class="text-sm font-semibold uppercase tracking-wider text-cyan-700">Νομικά</p>
+      <h1 class="mt-3 font-display font-bold text-crimson text-4xl md:text-5xl leading-tight">Πολιτική Απορρήτου</h1>
+      <p class="mt-4 text-ink-muted text-lg leading-relaxed">
+        Η παρούσα πολιτική περιγράφει πώς η First Aid Academy συλλέγει, χρησιμοποιεί, αποθηκεύει και προστατεύει
+        τα προσωπικά δεδομένα των επισκεπτών και των εκπαιδευομένων, σύμφωνα με τον Γενικό Κανονισμό Προστασίας
+        Δεδομένων (ΕΕ 2016/679 — GDPR) και τον Ν. 4624/2019.
+      </p>
+      <p class="mt-3 text-sm text-ink-muted">Τελευταία ενημέρωση: {lastUpdated}</p>
+    </div>
+  </Section>
+
+  <Section tone="soft" pad="lg">
+    <div class="grid lg:grid-cols-12 gap-10">
+      <aside class="lg:col-span-3">
+        <nav aria-label="Περιεχόμενα" class="lg:sticky lg:top-28">
+          <p class="text-sm font-semibold uppercase tracking-wider text-cyan-700">Περιεχόμενα</p>
+          <ol class="mt-4 space-y-2 text-sm">
+            {sections.map(s => (
+              <li><a href={`#${s.id}`} class="text-ink-muted hover:text-crimson no-underline">{s.title}</a></li>
+            ))}
+          </ol>
+        </nav>
+      </aside>
+
+      <div class="lg:col-span-9 prose-policy space-y-12">
+        {/* Sections inserted in Tasks 3–7 */}
+      </div>
+    </div>
+  </Section>
+</PageLayout>
+
+<style>
+  .prose-policy h2 { font-family: var(--font-display); color: var(--color-crimson, #b91c1c); font-weight: 700; font-size: 1.875rem; line-height: 1.2; scroll-margin-top: 7rem; }
+  .prose-policy h3 { font-family: var(--font-display); color: var(--color-ink-strong, #0f172a); font-weight: 600; font-size: 1.25rem; margin-top: 1.5rem; }
+  .prose-policy p  { color: var(--color-ink-muted, #475569); line-height: 1.75; margin-top: 1rem; }
+  .prose-policy ul { margin-top: 1rem; padding-left: 1.25rem; list-style: disc; color: var(--color-ink-muted, #475569); }
+  .prose-policy li { margin-top: 0.5rem; line-height: 1.7; }
+  .prose-policy a  { color: var(--color-cyan-700, #0e7490); text-decoration: underline; }
+  .prose-policy strong { color: var(--color-ink-strong, #0f172a); }
+</style>
