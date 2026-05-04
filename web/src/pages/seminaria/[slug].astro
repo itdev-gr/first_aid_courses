@@ -6,6 +6,7 @@ import ProgramHero from '../../components/programs/ProgramHero.astro';
 import CurriculumTable from '../../components/programs/CurriculumTable.astro';
 import BookProgramCTA from '../../components/programs/BookProgramCTA.astro';
 import RelatedPrograms from '../../components/programs/RelatedPrograms.astro';
+import ProgramGallery from '../../components/programs/ProgramGallery.astro';
 import Reveal from '../../components/motion/Reveal.astro';
 
 export async function getStaticPaths() {
@@ -45,6 +46,12 @@ const d = { ...entry.data, slug: entry.slug };
           <div class="mt-6">
             <CurriculumTable theory={d.theory} skills={d.skills} />
           </div>
+
+          {d.galleryImages && d.galleryImages.length > 0 && (
+            <div class="mt-12">
+              <ProgramGallery images={d.galleryImages} titleEl={d.titleEl} />
+            </div>
+          )}
 
           <div class="mt-12 grid sm:grid-cols-3 gap-6 border-t border-hairline pt-8">
             <div>

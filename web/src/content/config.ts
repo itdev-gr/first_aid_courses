@@ -19,7 +19,7 @@ const programs = defineCollection({
     skills:     z.array(z.string()),
     heroImage:  image(),
     badgeImage: image().optional(),
-    galleryImages: z.array(z.string()).default([]),
+    galleryImages: z.array(image()).default([]),
     tags:       z.array(z.string()).default([]),
     order:      z.number().default(99),
     featured:   z.boolean().default(false),
