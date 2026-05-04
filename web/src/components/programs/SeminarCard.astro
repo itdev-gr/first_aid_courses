@@ -1,7 +1,6 @@
 ---
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
-import Button from '../ui/Button.astro';
 
 interface Props { entry: CollectionEntry<'programs'>; }
 const { entry } = Astro.props;
@@ -10,9 +9,12 @@ const {
 } = entry.data;
 
 const logo = badgeImage ?? heroImage;
-const ctaHref = `/kratisi/?program=${entry.slug}`;
+const detailsHref = `/seminaria/${entry.slug}/`;
 ---
-<article class="flex flex-col items-center text-center bg-white rounded-2xl border border-hairline p-6 md:p-8 shadow-tile h-full">
+<a
+  href={detailsHref}
+  class="group flex flex-col items-center text-center bg-white rounded-2xl border border-hairline p-6 md:p-8 shadow-tile h-full no-underline hover:shadow-tileHover hover:-translate-y-1 transition-out focus:outline-none focus-visible:ring-2 focus-visible:ring-crimson"
+>
   <div class="w-32 h-32 md:w-36 md:h-36 rounded-full bg-white flex items-center justify-center overflow-hidden">
     <Image
       src={logo}
@@ -23,7 +25,7 @@ const ctaHref = `/kratisi/?program=${entry.slug}`;
     />
   </div>
 
-  <h3 class="mt-5 font-display font-semibold text-ink-strong text-lg md:text-xl leading-tight">
+  <h3 class="mt-5 font-display font-semibold text-ink-strong text-lg md:text-xl leading-tight group-hover:text-crimson transition-out">
     {titleEl}
   </h3>
   <p class="mt-1 text-ink-strong font-semibold">
@@ -44,8 +46,8 @@ const ctaHref = `/kratisi/?program=${entry.slug}`;
         €{priceEur} <span class="text-base font-normal">/ άτομο</span>
       </p>
     )}
-    <Button href={ctaHref} variant="primary" size="md" className="mt-6">
-      Επιλογή Ημερομηνίας
-    </Button>
+    <span class="mt-6 inline-flex items-center justify-center text-center font-semibold transition-out text-base px-5 py-3.5 rounded-md bg-crimson text-white group-hover:bg-crimson-600 group-hover:shadow-cta">
+      Περισσότερες Λεπτομέρειες
+    </span>
   </div>
-</article>
+</a>
