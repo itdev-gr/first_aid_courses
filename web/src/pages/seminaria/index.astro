@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import PageLayout from '../../layouts/PageLayout.astro';
 import Section from '../../components/layout/Section.astro';
 import ProgramCard from '../../components/programs/ProgramCard.astro';
+import SeminarCard from '../../components/programs/SeminarCard.astro';
 import Reveal from '../../components/motion/Reveal.astro';
 
 const all = (await getCollection('programs')).sort((a, b) => a.data.order - b.data.order);
@@ -18,9 +19,7 @@ const businesses  = all.filter(p => p.data.audience === 'business');
       <p class="text-sm font-semibold uppercase tracking-wider text-cyan-700">Σεμινάρια</p>
       <h1 class="mt-3 font-display font-bold text-crimson text-4xl md:text-5xl leading-tight">Όλα τα σεμινάρια Πρώτων Βοηθειών</h1>
       <p class="mt-4 text-ink-muted text-lg leading-relaxed">
-        Από εντατικά σεμινάρια 5 ωρών έως ολοκληρωμένη κατάρτιση 18 ωρών — επιλέξτε
-        το πρόγραμμα που ταιριάζει στις ανάγκες σας. Όλα τα σεμινάρια καταλήγουν σε
-        αξιολόγηση και πιστοποιητικό συμμετοχής.
+        Επιλέξτε σεμινάριο και πατήστε <strong>«Επιλογή Ημερομηνίας»</strong> για να δείτε διαθεσιμότητα και να κλείσετε τη θέση σας.
       </p>
     </div>
   </Section>
@@ -30,7 +29,7 @@ const businesses  = all.filter(p => p.data.audience === 'business');
     <h2 class="mt-3 text-crimson font-display font-semibold text-3xl md:text-4xl">Ατομικά προγράμματα</h2>
     <Reveal stagger={0.08}>
       <ul class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {individuals.map((p) => <li><ProgramCard entry={p} /></li>)}
+        {individuals.map((p) => <li><SeminarCard entry={p} /></li>)}
       </ul>
     </Reveal>
   </Section>

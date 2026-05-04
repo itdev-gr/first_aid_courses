@@ -8,11 +8,12 @@ export const primaryNav: NavItem[] = [
   { label: 'Αρχική',       href: '/' },
   { label: 'Σεμινάρια',    href: '/seminaria/' },
   { label: 'Επιχειρήσεις', href: '/etairikoi/' },
+  { label: 'Τιμοκατάλογος', href: '/timokatalogos/' },
   { label: 'Σχετικά',      href: '/sxetika/' },
   { label: 'Επικοινωνία',  href: '/epikoinonia/' },
 ];
 
-export const ctaNav: NavItem = { label: 'Κράτηση', href: '/kratisi/' };
+export const ctaNav: NavItem = { label: 'Πληροφορίες', href: '/kratisi/' };
 
 export const phone = {
   display: '+30 6900 000000',
