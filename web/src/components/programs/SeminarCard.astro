@@ -1,0 +1,50 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import Button from '../ui/Button.astro';
+
+interface Props { entry: CollectionEntry<'programs'>; }
+const { entry } = Astro.props;
+const {
+  code, titleEl, durationHours, evaluation, evaluationNote, priceEur, badgeImage, heroImage,
+} = entry.data;
+
+const logo = badgeImage ?? heroImage;
+const ctaHref = `/kratisi/?program=${entry.slug}`;
+---
+<article class="flex flex-col items-center text-center bg-white rounded-2xl border border-hairline p-6 md:p-8 shadow-tile h-full">
+  <div class="w-32 h-32 md:w-36 md:h-36 rounded-full bg-white flex items-center justify-center overflow-hidden">
+    <Image
+      src={logo}
+      alt={`Λογότυπο σεμιναρίου ${titleEl}`}
+      widths={[160, 240, 320]}
+      sizes="160px"
+      class="w-full h-full object-contain p-2"
+    />
+  </div>
+
+  <h3 class="mt-5 font-display font-semibold text-ink-strong text-lg md:text-xl leading-tight">
+    {titleEl}
+  </h3>
+  <p class="mt-1 text-ink-strong font-semibold">
+    (κωδικός {code})
+  </p>
+
+  <p class="mt-5 text-ink-muted text-sm leading-relaxed">
+    <span class="font-semibold text-ink-strong">Διάρκεια:</span> {durationHours} ώρες,
+    <span class="font-semibold text-ink-strong">Αξιολόγηση:</span> {evaluation}
+    {evaluationNote && (
+      <span class="block mt-2 text-crimson font-semibold">({evaluationNote})</span>
+    )}
+  </p>
+
+  {priceEur !== undefined && (
+    <p class="mt-6 font-display font-bold text-ink-strong text-2xl">
+      €{priceEur} <span class="text-base font-normal">/ άτομο</span>
+    </p>
+  )}
+
+  <Button href={ctaHref} variant="primary" size="md" className="mt-6">
+    Επιλογή Ημερομηνίας
+  </Button>
+</article>
