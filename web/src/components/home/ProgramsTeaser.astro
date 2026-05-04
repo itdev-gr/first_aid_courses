@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Section from '../layout/Section.astro';
-import ProgramCard from '../programs/ProgramCard.astro';
+import SeminarCard from '../programs/SeminarCard.astro';
 import Button from '../ui/Button.astro';
 import Reveal from '../motion/Reveal.astro';
 const all = await getCollection('programs');
@@ -20,7 +20,7 @@ const featured = all.filter(p => p.data.featured).sort((a,b) => a.data.order - b
   <Reveal stagger={0.1}>
     <ul class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {featured.map((entry) => (
-        <li><ProgramCard entry={entry} /></li>
+        <li><SeminarCard entry={entry} /></li>
       ))}
     </ul>
   </Reveal>
