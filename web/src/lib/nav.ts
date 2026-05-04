@@ -8,6 +8,7 @@ export const primaryNav: NavItem[] = [
   { label: 'Αρχική',       href: '/' },
   { label: 'Σεμινάρια',    href: '/seminaria/' },
   { label: 'Επιχειρήσεις', href: '/etairikoi/' },
+  { label: 'Τιμοκατάλογος', href: '/timokatalogos/' },
   { label: 'Σχετικά',      href: '/sxetika/' },
   { label: 'Επικοινωνία',  href: '/epikoinonia/' },
 ];
