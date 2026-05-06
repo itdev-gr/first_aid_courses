@@ -4,12 +4,35 @@ import PageLayout from '../layouts/PageLayout.astro';
 import Section from '../components/layout/Section.astro';
 import Button from '../components/ui/Button.astro';
 import { phone } from '../lib/nav';
+import { listAvailableForProgram } from '../lib/firebase/sessions';
+import { formatAthensDisplay } from '../lib/firebase/sessions';
 
 const programs = (await getCollection('programs')).sort((a, b) => a.data.order - b.data.order);
+
+// Read initial program from URL param
+const url = new URL(Astro.request.url);
+const initialProgram = url.searchParams.get('program') ?? '';
+const initialType = url.searchParams.get('type') === 'business' ? 'business' : 'individual';
+
+// Pre-fetch available sessions for the initially-selected program (server-side)
+let initialSessions: Array<{ id: string; label: string; priceEur: number; capacity: number | null }> = [];
+if (initialProgram && programs.some((p) => p.slug === initialProgram)) {
+  try {
+    const list = await listAvailableForProgram(initialProgram);
+    initialSessions = list.map((s) => ({
+      id: s.id,
+      label: `${formatAthensDisplay(s.startsAt)} · ${s.location}${s.capacity != null ? ` · ${s.capacity} θέσεις` : ''}`,
+      priceEur: s.priceEur,
+      capacity: s.capacity,
+    }));
+  } catch {
+    initialSessions = [];
+  }
+}
 ---
 <PageLayout
   title="Κράτηση Σεμιναρίου"
-  description="Κρατήστε τη θέση σας στο επόμενο σεμινάριο της First Aid Academy. Συμπληρώστε τη φόρμα και θα σας απαντήσουμε εντός 24 ωρών.">
+  description="Κρατήστε τη θέση σας στο επόμενο σεμινάριο της First Aid Academy. Συμπληρώστε τη φόρμα και θα προχωρήσετε στη πληρωμή.">
 
   <Section tone="default" pad="lg">
     <div class="grid lg:grid-cols-12 gap-12">
@@ -17,47 +40,54 @@ const programs = (await getCollection('programs')).sort((a, b) => a.data.order -
         <p class="text-sm font-semibold uppercase tracking-wider text-cyan-700">Κράτηση</p>
         <h1 class="mt-3 font-display font-bold text-crimson text-4xl md:text-5xl leading-tight">Κάντε κράτηση για το επόμενο σεμινάριο</h1>
         <p class="mt-4 text-ink-muted text-lg leading-relaxed">
-          Συμπληρώστε τα στοιχεία σας και θα επικοινωνήσουμε μαζί σας εντός 24 ωρών για
-          να επιβεβαιώσουμε ημερομηνία, τοποθεσία και κόστος. Δεν θα χρεωθείτε τίποτα
-          μέχρι την επιβεβαίωση.
+          Επιλέξτε το σεμινάριο και την ημερομηνία που σας ταιριάζει, συμπληρώστε τα στοιχεία σας
+          και θα προχωρήσετε στη πληρωμή για να επιβεβαιωθεί η κράτησή σας.
         </p>
 
-        <form
-          name="booking"
-          method="POST"
-          data-netlify="true"
-          netlify-honeypot="bot-field"
-          action="/kratisi/success/"
-          class="mt-10 space-y-6"
-        >
-          <input type="hidden" name="form-name" value="booking" />
-          <p class="hidden"><label>Μην συμπληρώνετε αυτό: <input name="bot-field" /></label></p>
+        <form id="booking-form" class="mt-10 space-y-6" novalidate>
+          <p class="hidden"><label>Μην συμπληρώνετε αυτό: <input name="botField" autocomplete="off"/></label></p>
 
           <fieldset class="space-y-4">
             <legend class="text-sm font-semibold uppercase tracking-wider text-cyan-700">Τύπος κράτησης</legend>
             <div class="grid sm:grid-cols-2 gap-3">
               <label class="flex items-start gap-3 border border-hairline rounded-xl p-4 has-[:checked]:border-crimson has-[:checked]:bg-surface-crimson cursor-pointer transition-out">
-                <input type="radio" name="type" value="individual" checked class="mt-1 accent-crimson" data-type-individual/>
+                <input type="radio" name="type" value="individual" class="mt-1 accent-crimson" checked={initialType === 'individual'}/>
                 <span><strong class="block text-ink-strong">Ιδιώτης / Γονέας</strong><span class="text-sm text-ink-muted">Ατομική συμμετοχή σε ομαδικό σεμινάριο.</span></span>
               </label>
               <label class="flex items-start gap-3 border border-hairline rounded-xl p-4 has-[:checked]:border-crimson has-[:checked]:bg-surface-crimson cursor-pointer transition-out">
-                <input type="radio" name="type" value="business" class="mt-1 accent-crimson" data-type-business/>
+                <input type="radio" name="type" value="business" class="mt-1 accent-crimson" checked={initialType === 'business'}/>
                 <span><strong class="block text-ink-strong">Επιχείρηση</strong><span class="text-sm text-ink-muted">Ενδοεπιχειρησιακή εκπαίδευση.</span></span>
               </label>
             </div>
           </fieldset>
 
           <div>
-            <label for="program" class="block text-sm font-semibold text-ink-edge">Σεμινάριο</label>
-            <select id="program" name="program" required class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20">
+            <label for="programSlug" class="block text-sm font-semibold text-ink-edge">Σεμινάριο *</label>
+            <select id="programSlug" name="programSlug" required class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20">
               <option value="">— Επιλέξτε σεμινάριο —</option>
-              {programs.map(p => (
-                <option value={p.slug}>
+              {programs.map((p) => (
+                <option value={p.slug} selected={p.slug === initialProgram}>
                   {p.data.titleEl} ({p.data.code} · {p.data.durationHours} ώρες)
                 </option>
               ))}
-              <option value="not-sure">Δεν είμαι σίγουρος/η — θέλω συμβουλή</option>
             </select>
+          </div>
+
+          <div>
+            <label for="sessionId" class="block text-sm font-semibold text-ink-edge">Διαθέσιμη ημερομηνία *</label>
+            <select id="sessionId" name="sessionId" required class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20" disabled={initialSessions.length === 0 && !initialProgram}>
+              {initialSessions.length === 0 ? (
+                <option value="">{initialProgram ? '— Δεν υπάρχουν διαθέσιμες ημερομηνίες αυτή τη στιγμή —' : '— Επιλέξτε πρώτα σεμινάριο —'}</option>
+              ) : (
+                <>
+                  <option value="">— Επιλέξτε ημερομηνία —</option>
+                  {initialSessions.map((s) => (
+                    <option value={s.id} data-price={s.priceEur}>{s.label}</option>
+                  ))}
+                </>
+              )}
+            </select>
+            <p id="session-help" class="mt-1 text-xs text-ink-muted hidden">Δεν βρίσκετε ημερομηνία που να σας βολεύει; <a href="/epikoinonia/" class="text-cyan-700 font-semibold no-underline">Επικοινωνήστε μαζί μας</a> για ιδιωτικό σεμινάριο.</p>
           </div>
 
           <div class="grid sm:grid-cols-2 gap-4">
@@ -82,20 +112,19 @@ const programs = (await getCollection('programs')).sort((a, b) => a.data.order -
             </div>
           </div>
 
-          <div class="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label for="participants" class="block text-sm font-semibold text-ink-edge">Αριθμός συμμετεχόντων</label>
-              <input id="participants" name="participants" type="number" min="1" max="200" placeholder="1" class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20"/>
-            </div>
-            <div>
-              <label for="preferred-date" class="block text-sm font-semibold text-ink-edge">Προτιμώμενη ημερομηνία</label>
-              <input id="preferred-date" name="preferred_date" type="date" class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20"/>
-            </div>
+          <div>
+            <label for="participantCount" class="block text-sm font-semibold text-ink-edge">Αριθμός συμμετεχόντων *</label>
+            <input id="participantCount" name="participantCount" type="number" min="1" max="200" value="1" required class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20"/>
           </div>
 
           <div>
             <label for="message" class="block text-sm font-semibold text-ink-edge">Σχόλια / ερωτήσεις</label>
-            <textarea id="message" name="message" rows="4" class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20"></textarea>
+            <textarea id="message" name="message" rows="3" class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20"></textarea>
+          </div>
+
+          <div id="total-display" class="hidden bg-surface-soft rounded-xl p-4 flex items-center justify-between">
+            <span class="text-ink-muted text-sm">Σύνολο για <span id="total-count">1</span> άτομο/α:</span>
+            <span class="font-display font-bold text-crimson text-2xl">€<span id="total-amount">—</span></span>
           </div>
 
           <label class="flex items-start gap-3 text-sm text-ink-muted">
@@ -103,8 +132,10 @@ const programs = (await getCollection('programs')).sort((a, b) => a.data.order -
             <span>Συμφωνώ με τους όρους και την επεξεργασία των στοιχείων μου για την εξυπηρέτηση της κράτησης. *</span>
           </label>
 
+          <p id="form-error" class="hidden text-sm text-crimson font-semibold" role="alert"></p>
+
           <div class="pt-2">
-            <Button type="submit" variant="primary" size="lg">Στείλτε αίτημα κράτησης</Button>
+            <Button type="submit" variant="primary" size="lg">Συνέχεια στην πληρωμή</Button>
           </div>
         </form>
       </div>
@@ -113,9 +144,9 @@ const programs = (await getCollection('programs')).sort((a, b) => a.data.order -
         <div class="lg:sticky lg:top-28 bg-surface-cyan border border-cyan/20 rounded-3xl p-6 md:p-8">
           <h2 class="font-display font-bold text-crimson text-2xl">Τι ακολουθεί;</h2>
           <ol class="mt-6 space-y-5 text-ink leading-relaxed">
-            <li class="flex gap-3"><span class="font-display font-bold text-crimson">1.</span><span>Λαμβάνουμε το αίτημά σας και επικοινωνούμε εντός 24 ωρών.</span></li>
-            <li class="flex gap-3"><span class="font-display font-bold text-crimson">2.</span><span>Συμφωνούμε ημερομηνία, τοποθεσία και κόστος.</span></li>
-            <li class="flex gap-3"><span class="font-display font-bold text-crimson">3.</span><span>Λαμβάνετε επιβεβαίωση και οδηγίες προετοιμασίας.</span></li>
+            <li class="flex gap-3"><span class="font-display font-bold text-crimson">1.</span><span>Συμπληρώνετε τα στοιχεία και επιλέγετε ημερομηνία.</span></li>
+            <li class="flex gap-3"><span class="font-display font-bold text-crimson">2.</span><span>Προχωράτε σε ασφαλή online πληρωμή για να επιβεβαιωθεί η θέση σας.</span></li>
+            <li class="flex gap-3"><span class="font-display font-bold text-crimson">3.</span><span>Λαμβάνετε email επιβεβαίωσης με τις λεπτομέρειες.</span></li>
             <li class="flex gap-3"><span class="font-display font-bold text-crimson">4.</span><span>Παρακολουθείτε το σεμινάριο — πιστοποιητικό συμμετοχής στο τέλος.</span></li>
           </ol>
           <hr class="my-6 border-cyan/30" />
@@ -128,20 +159,109 @@ const programs = (await getCollection('programs')).sort((a, b) => a.data.order -
   </Section>
 
   <script>
-    // Read URL params on page load and pre-select form fields
-    const params = new URLSearchParams(window.location.search);
-    const programParam = params.get('program');
-    const typeParam = params.get('type');
+    const form = document.getElementById('booking-form') as HTMLFormElement;
+    const programSel = document.getElementById('programSlug') as HTMLSelectElement;
+    const sessionSel = document.getElementById('sessionId') as HTMLSelectElement;
+    const sessionHelp = document.getElementById('session-help') as HTMLElement;
+    const participantInput = document.getElementById('participantCount') as HTMLInputElement;
+    const totalDisplay = document.getElementById('total-display') as HTMLElement;
+    const totalCount = document.getElementById('total-count') as HTMLElement;
+    const totalAmount = document.getElementById('total-amount') as HTMLElement;
+    const errEl = document.getElementById('form-error') as HTMLElement;
 
-    if (programParam) {
-      const select = document.getElementById('program') as HTMLSelectElement | null;
-      if (select && [...select.options].some(o => o.value === programParam)) {
-        select.value = programParam;
+    function updateTotal() {
+      const opt = sessionSel.options[sessionSel.selectedIndex];
+      const price = Number(opt?.dataset.price ?? 0);
+      const count = Math.max(1, Number(participantInput.value || 1));
+      if (price > 0 && opt?.value) {
+        totalCount.textContent = String(count);
+        totalAmount.textContent = String(price * count);
+        totalDisplay.classList.remove('hidden');
+      } else {
+        totalDisplay.classList.add('hidden');
       }
     }
-    if (typeParam === 'business') {
-      const radio = document.querySelector<HTMLInputElement>('[data-type-business]');
-      if (radio) radio.checked = true;
+
+    async function loadSessions(programSlug: string) {
+      sessionSel.disabled = true;
+      sessionSel.innerHTML = '<option value="">— Φόρτωση… —</option>';
+      try {
+        const res = await fetch(`/api/sessions/available?program=${encodeURIComponent(programSlug)}`);
+        const data = await res.json() as { sessions?: Array<{ id: string; startsAt: string; location: string; capacity: number | null; priceEur: number }> };
+        const sessions = data.sessions ?? [];
+        if (sessions.length === 0) {
+          sessionSel.innerHTML = '<option value="">— Δεν υπάρχουν διαθέσιμες ημερομηνίες αυτή τη στιγμή —</option>';
+          sessionHelp.classList.remove('hidden');
+        } else {
+          sessionHelp.classList.add('hidden');
+          const fmt = new Intl.DateTimeFormat('el-GR', {
+            timeZone: 'Europe/Athens',
+            weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
+          });
+          sessionSel.innerHTML = '<option value="">— Επιλέξτε ημερομηνία —</option>' + sessions.map((s) => {
+            const label = `${fmt.format(new Date(s.startsAt))} · ${s.location}${s.capacity != null ? ` · ${s.capacity} θέσεις` : ''}`;
+            return `<option value="${s.id}" data-price="${s.priceEur}">${label}</option>`;
+          }).join('');
+          sessionSel.disabled = false;
+        }
+      } catch {
+        sessionSel.innerHTML = '<option value="">— Σφάλμα φόρτωσης —</option>';
+      }
+      updateTotal();
     }
+
+    programSel.addEventListener('change', () => {
+      if (programSel.value) loadSessions(programSel.value);
+      else {
+        sessionSel.innerHTML = '<option value="">— Επιλέξτε πρώτα σεμινάριο —</option>';
+        sessionSel.disabled = true;
+        sessionHelp.classList.add('hidden');
+        updateTotal();
+      }
+    });
+    sessionSel.addEventListener('change', updateTotal);
+    participantInput.addEventListener('input', updateTotal);
+    updateTotal();
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errEl.classList.add('hidden');
+      const fd = new FormData(form);
+      const body = {
+        botField: fd.get('botField'),
+        sessionId: fd.get('sessionId'),
+        programSlug: fd.get('programSlug'),
+        type: fd.get('type'),
+        name: fd.get('name'),
+        email: fd.get('email'),
+        phone: fd.get('phone'),
+        company: fd.get('company') || null,
+        participantCount: Number(fd.get('participantCount')),
+        message: fd.get('message') || null,
+        consent: fd.get('consent') === 'on',
+      };
+      const res = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        window.location.href = `/kratisi/success/?id=${encodeURIComponent((data as { id: string }).id)}`;
+      } else {
+        const code = (data as { error?: string }).error ?? 'unknown';
+        const messages: Record<string, string> = {
+          'consent required': 'Πρέπει να συμφωνήσετε με τους όρους.',
+          'missing or invalid fields': 'Συμπληρώστε όλα τα υποχρεωτικά πεδία.',
+          'invalid participantCount': 'Μη έγκυρος αριθμός συμμετεχόντων.',
+          'sold-out': 'Δεν υπάρχουν αρκετές διαθέσιμες θέσεις στη συγκεκριμένη ημερομηνία.',
+          'session-not-available': 'Η ημερομηνία δεν είναι πλέον διαθέσιμη.',
+          'session-past': 'Η ημερομηνία έχει ήδη παρέλθει.',
+          'session-not-found': 'Η ημερομηνία δεν βρέθηκε. Επιλέξτε άλλη.',
+        };
+        errEl.textContent = messages[code] ?? 'Σφάλμα κατά την αποθήκευση. Δοκιμάστε ξανά.';
+        errEl.classList.remove('hidden');
+      }
+    });
   </script>
 </PageLayout>

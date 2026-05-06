@@ -53,6 +53,22 @@ export async function listSessions(): Promise<SessionDoc[]> {
   return snap.docs.map((d) => fromDoc(d as QueryDocumentSnapshot));
 }
 
+/**
+ * Public-facing query: scheduled sessions for a program in the future, oldest first, capped.
+ * Used by the public booking form `/kratisi/`.
+ */
+export async function listAvailableForProgram(programSlug: string, limit = 12): Promise<SessionDoc[]> {
+  const snap = await adminDb()
+    .collection(COLLECTION)
+    .where('programSlug', '==', programSlug)
+    .where('status', '==', 'scheduled')
+    .where('startsAt', '>', Timestamp.fromDate(new Date()))
+    .orderBy('startsAt', 'asc')
+    .limit(limit)
+    .get();
+  return snap.docs.map((d) => fromDoc(d as QueryDocumentSnapshot));
+}
+
 export async function getSession(id: string): Promise<SessionDoc | null> {
   const snap = await adminDb().collection(COLLECTION).doc(id).get();
   if (!snap.exists) return null;
