@@ -87,6 +87,31 @@ export async function deleteSession(id: string): Promise<void> {
   await adminDb().collection(COLLECTION).doc(id).delete();
 }
 
+/**
+ * Parse a 'YYYY-MM-DDTHH:MM' string as Europe/Athens local time and return the equivalent UTC Date.
+ * Needed because `new Date("YYYY-MM-DDTHH:MM")` uses the server's local TZ (UTC on Vercel),
+ * which would shift every session 2–3h off intent.
+ */
+export function parseAthensLocal(input: string): Date {
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(input);
+  if (!m) return new Date(NaN);
+  const [, ys, mos, ds, hs, mis] = m;
+  const utcGuessMs = Date.UTC(Number(ys), Number(mos) - 1, Number(ds), Number(hs), Number(mis));
+  // What does Athens think the time is at utcGuessMs?
+  const fmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Europe/Athens',
+    year: 'numeric', month: 'numeric', day: 'numeric',
+    hour: 'numeric', minute: 'numeric', hour12: false,
+  });
+  const parts = fmt.formatToParts(new Date(utcGuessMs));
+  const g = (t: string) => Number(parts.find((p) => p.type === t)?.value ?? '0');
+  let h = g('hour');
+  if (h === 24) h = 0; // Intl quirk for midnight
+  const athensAsUtcMs = Date.UTC(g('year'), g('month') - 1, g('day'), h, g('minute'));
+  const offsetMs = athensAsUtcMs - utcGuessMs; // how far Athens is ahead of UTC at that moment
+  return new Date(utcGuessMs - offsetMs);
+}
+
 /** Format a Date as 'YYYY-MM-DDTHH:MM' in Europe/Athens for <input type="datetime-local">. */
 export function toAthensInputValue(date: Date): string {
   const fmt = new Intl.DateTimeFormat('en-CA', {

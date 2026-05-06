@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { createSession, type SessionStatus } from '../../../../lib/firebase/sessions';
+import { createSession, parseAthensLocal, type SessionStatus } from '../../../../lib/firebase/sessions';
 
 const STATUSES: SessionStatus[] = ['scheduled', 'cancelled', 'completed'];
 
@@ -27,7 +27,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return new Response(JSON.stringify({ error: 'capacity must be a positive integer or empty' }), { status: 400 });
   }
 
-  const startsAt = new Date(startsAtStr);
+  const startsAt = parseAthensLocal(startsAtStr);
   if (Number.isNaN(startsAt.getTime())) {
     return new Response(JSON.stringify({ error: 'invalid date' }), { status: 400 });
   }

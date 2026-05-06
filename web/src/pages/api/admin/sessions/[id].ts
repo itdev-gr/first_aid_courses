@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { updateSession, deleteSession, type SessionStatus } from '../../../../lib/firebase/sessions';
+import { updateSession, deleteSession, parseAthensLocal, type SessionStatus } from '../../../../lib/firebase/sessions';
 
 const STATUSES: SessionStatus[] = ['scheduled', 'cancelled', 'completed'];
 
@@ -16,7 +16,7 @@ export const PUT: APIRoute = async ({ request, params, locals }) => {
   if (typeof body.location === 'string') update.location = body.location.trim();
   if (typeof body.notes === 'string' || body.notes === null) update.notes = body.notes ? String(body.notes).trim() : null;
   if (body.startsAt !== undefined) {
-    const d = new Date(String(body.startsAt));
+    const d = parseAthensLocal(String(body.startsAt));
     if (Number.isNaN(d.getTime())) return new Response(JSON.stringify({ error: 'invalid date' }), { status: 400 });
     update.startsAt = d;
   }
