@@ -40,15 +40,15 @@ import { phone } from '../lib/nav';
         </p>
 
         <form
+          id="contact-form"
           name="contact"
           method="POST"
-          data-netlify="true"
-          netlify-honeypot="bot-field"
-          action="/epikoinonia/?sent=1"
           class="bg-surface-soft rounded-3xl p-6 md:p-8 space-y-5"
         >
-          <input type="hidden" name="form-name" value="contact" />
-          <p class="hidden"><label>Μην συμπληρώνετε: <input name="bot-field" /></label></p>
+          <input type="hidden" name="access_key" value="043690af-f9a4-4f6c-b6b4-6829759d1040" />
+          <input type="hidden" name="from_name" value="First Aid Academy — Φόρμα επικοινωνίας" />
+          <input type="hidden" name="redirect" value="false" />
+          <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off"/>
 
           <h2 class="font-display font-bold text-crimson text-2xl">Στείλτε μας μήνυμα</h2>
 
@@ -73,6 +73,8 @@ import { phone } from '../lib/nav';
             <textarea id="c-message" name="message" rows="6" required class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20"></textarea>
           </div>
 
+          <p id="contact-error" class="hidden text-sm text-crimson font-semibold" role="alert"></p>
+
           <Button type="submit" variant="primary" size="lg">Αποστολή μηνύματος</Button>
         </form>
       </div>
@@ -80,9 +82,44 @@ import { phone } from '../lib/nav';
   </Section>
 
   <script>
-    if (new URLSearchParams(window.location.search).get('sent') === '1') {
-      const banner = document.getElementById('contact-success');
-      if (banner) banner.hidden = false;
-    }
+    const form = document.getElementById('contact-form') as HTMLFormElement | null;
+    const banner = document.getElementById('contact-success');
+    const errEl = document.getElementById('contact-error');
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errEl?.classList.add('hidden');
+      const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      const originalText = submitBtn?.textContent ?? '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Αποστολή…';
+      }
+      try {
+        const fd = new FormData(form);
+        const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && (data as { success?: boolean }).success !== false) {
+          form.reset();
+          banner?.removeAttribute('hidden');
+          form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          if (errEl) {
+            errEl.textContent = (data as { message?: string }).message ?? 'Σφάλμα αποστολής. Δοκιμάστε ξανά.';
+            errEl.classList.remove('hidden');
+          }
+        }
+      } catch {
+        if (errEl) {
+          errEl.textContent = 'Σφάλμα δικτύου. Δοκιμάστε ξανά.';
+          errEl.classList.remove('hidden');
+        }
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      }
+    });
   </script>
 </PageLayout>
