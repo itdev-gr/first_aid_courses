@@ -2,7 +2,23 @@ import type { APIRoute } from 'astro';
 import { getBooking, updateBooking } from '../../../lib/firebase/bookings';
 import { createOrder, isMock } from '../../../lib/viva';
 
-export const POST: APIRoute = async ({ request, url }) => {
+/**
+ * Resolve the public-facing origin. Astro.url on Vercel serverless gives
+ * 'https://localhost' because the function's internal request URL doesn't
+ * match the public host. Read from forwarded headers, with a Vercel env
+ * fallback.
+ */
+function resolveOrigin(request: Request): string {
+  const forwardedHost = request.headers.get('x-forwarded-host') ?? request.headers.get('host');
+  const forwardedProto = request.headers.get('x-forwarded-proto') ?? 'https';
+  if (forwardedHost) return `${forwardedProto}://${forwardedHost}`;
+  // Vercel sets VERCEL_URL to <deployment>.vercel.app at runtime
+  const vercelUrl = process.env.VERCEL_URL;
+  if (vercelUrl) return `https://${vercelUrl}`;
+  return 'https://first-aid-courses.vercel.app';
+}
+
+export const POST: APIRoute = async ({ request }) => {
   const body = (await request.json().catch(() => null)) as { bookingId?: string } | null;
   if (!body?.bookingId) {
     return new Response(JSON.stringify({ error: 'bookingId required' }), { status: 400, headers: { 'content-type': 'application/json' } });
@@ -13,7 +29,7 @@ export const POST: APIRoute = async ({ request, url }) => {
   if (booking.status === 'paid') return new Response(JSON.stringify({ error: 'already-paid' }), { status: 409, headers: { 'content-type': 'application/json' } });
   if (booking.status === 'cancelled' || booking.status === 'expired') return new Response(JSON.stringify({ error: 'booking-not-active' }), { status: 409, headers: { 'content-type': 'application/json' } });
 
-  const origin = url.origin;
+  const origin = resolveOrigin(request);
   const successUrl = `${origin}/kratisi/paid/?id=${booking.id}`;
   const failureUrl = `${origin}/kratisi/payment-failed/?id=${booking.id}`;
 
