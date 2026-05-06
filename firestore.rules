@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Sessions: public can read scheduled sessions, signed-in admin can write
+    match /sessions/{sessionId} {
+      allow read: if resource.data.status == 'scheduled';
+      allow write: if request.auth != null;
+    }
+
+    // Bookings: admin only for now (Phase 3 will allow public create with field validation)
+    match /bookings/{bookingId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

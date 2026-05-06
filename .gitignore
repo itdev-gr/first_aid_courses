@@ -4,8 +4,13 @@ Thumbs.db
 node_modules/
 dist/
 .astro/
+.vercel/
 .env
 .env.local
+
+# Firebase admin service account (NEVER commit)
+firebase-admin-key.json
+*-firebase-adminsdk-*.json
 *.log
 /tmp-extract/
 

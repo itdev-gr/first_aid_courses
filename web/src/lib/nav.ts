@@ -18,5 +18,5 @@ export const ctaNav: NavItem = { label: 'Πληροφορίες', href: '/kratis
 export const phone = {
   display: '+30 6900 000000',
   tel:     '+306900000000',
-  email:   'info@firstaidacademy.gr',
+  email:   'info@firstaid-academy.gr',
 };

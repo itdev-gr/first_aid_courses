@@ -1,0 +1,14 @@
+---
+import AdminLayout from '../../components/admin/AdminLayout.astro';
+const admin = Astro.locals.admin!;
+---
+<AdminLayout title="Πίνακας">
+  <div class="bg-white rounded-2xl border border-hairline shadow-tile p-8">
+    <h1 class="font-display font-bold text-crimson text-3xl">Καλώς ήρθατε</h1>
+    <p class="mt-3 text-ink-muted">Συνδεθήκατε ως <strong class="text-ink-strong">{admin.email}</strong>.</p>
+    <p class="mt-6 text-ink-muted leading-relaxed">
+      Από τον πίνακα μπορείτε να διαχειριστείτε τις διαθέσιμες ημερομηνίες σεμιναρίων, να δείτε τις
+      κρατήσεις και τις πληρωμές. Επιλέξτε μια ενότητα από το αριστερό μενού.
+    </p>
+  </div>
+</AdminLayout>
