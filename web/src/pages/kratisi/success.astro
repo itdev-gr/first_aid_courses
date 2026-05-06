@@ -62,10 +62,42 @@ const minutesUntilExpiry = booking
           </div>
 
           <div class="mt-8 flex flex-wrap justify-center gap-3">
-            <Button href={`#pay-${booking.id}`} variant="primary" size="lg">Πληρώστε τώρα</Button>
+            <button id="pay-now" type="button" data-booking-id={booking.id} class="inline-flex items-center justify-center text-center font-semibold transition-out text-base px-6 py-4 rounded-md bg-crimson text-white hover:bg-crimson-600 hover:shadow-cta no-underline">Πληρώστε τώρα</button>
             <Button href={`tel:${phone.tel}`} variant="secondary">Καλέστε μας</Button>
           </div>
-          <p class="mt-3 text-xs text-ink-muted">Σύνδεση με Viva Wallet — έρχεται σύντομα.</p>
+          <p id="pay-msg" class="mt-3 text-sm text-crimson font-semibold hidden" role="alert"></p>
+
+          <script>
+            const btn = document.getElementById('pay-now') as HTMLButtonElement | null;
+            const msg = document.getElementById('pay-msg') as HTMLElement | null;
+            btn?.addEventListener('click', async () => {
+              if (!btn || !msg) return;
+              btn.disabled = true;
+              btn.textContent = 'Σύνδεση με την πύλη πληρωμής…';
+              msg.classList.add('hidden');
+              try {
+                const res = await fetch('/api/payments/create-order', {
+                  method: 'POST',
+                  headers: { 'content-type': 'application/json' },
+                  body: JSON.stringify({ bookingId: btn.dataset.bookingId }),
+                });
+                const data = await res.json() as { checkoutUrl?: string; error?: string };
+                if (res.ok && data.checkoutUrl) {
+                  window.location.href = data.checkoutUrl;
+                } else {
+                  msg.textContent = data.error === 'already-paid' ? 'Η κράτηση έχει ήδη πληρωθεί.' : 'Σφάλμα κατά τη σύνδεση με την πύλη πληρωμής. Δοκιμάστε ξανά.';
+                  msg.classList.remove('hidden');
+                  btn.disabled = false;
+                  btn.textContent = 'Πληρώστε τώρα';
+                }
+              } catch {
+                msg.textContent = 'Σφάλμα δικτύου. Δοκιμάστε ξανά.';
+                msg.classList.remove('hidden');
+                btn.disabled = false;
+                btn.textContent = 'Πληρώστε τώρα';
+              }
+            });
+          </script>
         </>
       ) : (
         <>

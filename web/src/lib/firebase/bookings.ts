@@ -142,3 +142,14 @@ export async function updateBooking(id: string, fields: Partial<Pick<BookingDoc,
 export async function deleteBooking(id: string): Promise<void> {
   await adminDb().collection(COLLECTION).doc(id).delete();
 }
+
+/** Look up a booking by its payment-provider order code. */
+export async function findBookingByPaymentRef(orderCode: string): Promise<BookingDoc | null> {
+  const snap = await adminDb()
+    .collection(COLLECTION)
+    .where('paymentRef', '==', orderCode)
+    .limit(1)
+    .get();
+  if (snap.empty) return null;
+  return fromDoc(snap.docs[0] as QueryDocumentSnapshot);
+}

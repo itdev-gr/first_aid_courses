@@ -10,6 +10,11 @@ interface ImportMetaEnv {
   readonly FIREBASE_CLIENT_EMAIL: string;
   readonly FIREBASE_PRIVATE_KEY: string;
   readonly RESEND_API_KEY: string;
+  readonly VIVA_MODE: string;
+  readonly VIVA_CLIENT_ID: string;
+  readonly VIVA_CLIENT_SECRET: string;
+  readonly VIVA_SOURCE_CODE: string;
+  readonly VIVA_WEBHOOK_KEY: string;
 }
 
 interface ImportMeta {

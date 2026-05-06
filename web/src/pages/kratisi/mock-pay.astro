@@ -1,0 +1,63 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import Section from '../../components/layout/Section.astro';
+import Button from '../../components/ui/Button.astro';
+import { isMock } from '../../lib/viva';
+
+if (!isMock()) {
+  return Astro.redirect('/', 302);
+}
+
+const url = new URL(Astro.request.url);
+const orderCode = url.searchParams.get('order') ?? '';
+const bookingId = url.searchParams.get('bookingId') ?? '';
+const amount = url.searchParams.get('amount') ?? '';
+const successUrl = url.searchParams.get('successUrl') ?? '/';
+const failureUrl = url.searchParams.get('failureUrl') ?? '/';
+---
+<PageLayout title="Πληρωμή (mock)" description="Δοκιμαστική σελίδα πληρωμής για development." noindex>
+  <Section tone="default" pad="lg">
+    <div class="max-w-xl mx-auto">
+      <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 text-sm">
+        <strong>Mock mode</strong> — αυτή είναι μια εικονική σελίδα πληρωμής για ανάπτυξη και δοκιμές.
+        Δεν χρεώνεται καμία κάρτα. Όταν ρυθμιστεί το <code>VIVA_MODE=demo</code>, ο πελάτης θα ανακατευθύνεται
+        στο πραγματικό Viva Wallet demo.
+      </div>
+
+      <h1 class="mt-8 font-display font-bold text-crimson text-3xl">Επιβεβαίωση πληρωμής</h1>
+      <dl class="mt-6 bg-white border border-hairline rounded-2xl p-6 shadow-tile space-y-3 text-sm">
+        <div class="flex justify-between gap-4"><dt class="text-ink-muted">Order</dt><dd class="font-mono text-ink-strong">{orderCode}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-ink-muted">Booking</dt><dd class="font-mono text-ink-strong">{bookingId}</dd></div>
+        <div class="flex justify-between gap-4 pt-3 border-t border-hairline"><dt class="text-ink-muted">Σύνολο</dt><dd class="font-display font-bold text-crimson text-2xl">€{amount}</dd></div>
+      </dl>
+
+      <p id="mock-status" class="mt-4 text-sm hidden" role="status"></p>
+
+      <div class="mt-6 flex flex-wrap gap-3">
+        <Button id="mock-success" type="button" variant="primary" size="lg">Επιτυχής πληρωμή</Button>
+        <Button id="mock-fail" type="button" variant="secondary" size="md">Αποτυχία πληρωμής</Button>
+      </div>
+    </div>
+  </Section>
+
+  <script define:vars={{ bookingId, orderCode, successUrl, failureUrl }}>
+    const statusEl = document.getElementById('mock-status');
+    document.getElementById('mock-success')?.addEventListener('click', async () => {
+      statusEl.textContent = 'Επεξεργασία πληρωμής…';
+      statusEl.className = 'mt-4 text-sm text-ink-muted';
+      const res = await fetch('/api/payments/mock-confirm', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ bookingId, orderCode, status: 'paid' }),
+      });
+      if (res.ok) window.location.href = successUrl;
+      else {
+        statusEl.textContent = 'Σφάλμα πληρωμής. Δοκιμάστε ξανά.';
+        statusEl.className = 'mt-4 text-sm text-crimson font-semibold';
+      }
+    });
+    document.getElementById('mock-fail')?.addEventListener('click', () => {
+      window.location.href = failureUrl;
+    });
+  </script>
+</PageLayout>

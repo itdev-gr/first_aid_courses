@@ -1,0 +1,52 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import Section from '../../components/layout/Section.astro';
+import Button from '../../components/ui/Button.astro';
+import { phone } from '../../lib/nav';
+import { getBooking } from '../../lib/firebase/bookings';
+import { getSession, formatAthensDisplay } from '../../lib/firebase/sessions';
+import { getCollection } from 'astro:content';
+
+const url = new URL(Astro.request.url);
+const id = url.searchParams.get('id');
+const booking = id ? await getBooking(id) : null;
+const session = booking ? await getSession(booking.sessionId) : null;
+const programs = await getCollection('programs');
+const programTitle = booking ? programs.find((p) => p.slug === booking.programSlug)?.data.titleEl ?? booking.programSlug : '';
+---
+<PageLayout title="Η πληρωμή ολοκληρώθηκε" description="Η πληρωμή σας ολοκληρώθηκε επιτυχώς. Σύντομα θα λάβετε email επιβεβαίωσης." noindex>
+  <Section tone="default" pad="lg">
+    <div class="max-w-2xl mx-auto text-center">
+      <div class="mx-auto h-16 w-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h1 class="mt-6 font-display font-bold text-emerald-700 text-3xl md:text-4xl">Η πληρωμή ολοκληρώθηκε</h1>
+
+      {booking ? (
+        <>
+          <p class="mt-4 text-ink-muted text-lg leading-relaxed">
+            Σας ευχαριστούμε. Η θέση σας δεσμεύτηκε. Σύντομα θα λάβετε email επιβεβαίωσης
+            με όλες τις λεπτομέρειες της κράτησής σας.
+          </p>
+
+          <div class="mt-8 bg-surface-soft rounded-2xl border border-hairline p-6 text-left space-y-3">
+            <div class="flex justify-between gap-4"><span class="text-sm text-ink-muted">Σεμινάριο</span><span class="text-sm font-semibold text-ink-strong">{programTitle}</span></div>
+            <div class="flex justify-between gap-4"><span class="text-sm text-ink-muted">Ημερομηνία</span><span class="text-sm font-semibold text-ink-strong">{session ? formatAthensDisplay(session.startsAt) : '—'}</span></div>
+            {session?.location && (
+              <div class="flex justify-between gap-4"><span class="text-sm text-ink-muted">Τοποθεσία</span><span class="text-sm font-semibold text-ink-strong">{session.location}</span></div>
+            )}
+            <div class="flex justify-between gap-4"><span class="text-sm text-ink-muted">Συμμετέχοντες</span><span class="text-sm font-semibold text-ink-strong">{booking.participantCount}</span></div>
+            <div class="flex justify-between gap-4 pt-3 border-t border-hairline"><span class="text-sm text-ink-muted">Πληρωμένο σύνολο</span><span class="font-display font-bold text-emerald-700 text-2xl">€{booking.totalEur}</span></div>
+          </div>
+        </>
+      ) : (
+        <p class="mt-4 text-ink-muted text-lg leading-relaxed">Σας ευχαριστούμε. Η πληρωμή σας ολοκληρώθηκε.</p>
+      )}
+
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <Button href="/" variant="primary">Επιστροφή στην αρχική</Button>
+        <Button href={`tel:${phone.tel}`} variant="secondary">Καλέστε μας</Button>
+      </div>
+    </div>
+  </Section>
+</PageLayout>
