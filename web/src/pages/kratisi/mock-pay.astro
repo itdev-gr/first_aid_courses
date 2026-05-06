@@ -34,8 +34,8 @@ const failureUrl = url.searchParams.get('failureUrl') ?? '/';
       <p id="mock-status" class="mt-4 text-sm hidden" role="status"></p>
 
       <div class="mt-6 flex flex-wrap gap-3">
-        <Button id="mock-success" type="button" variant="primary" size="lg">Επιτυχής πληρωμή</Button>
-        <Button id="mock-fail" type="button" variant="secondary" size="md">Αποτυχία πληρωμής</Button>
+        <button id="mock-success" type="button" class="inline-flex items-center justify-center text-center font-semibold transition-out text-base px-6 py-4 rounded-md bg-crimson text-white hover:bg-crimson-600 hover:shadow-cta">Επιτυχής πληρωμή</button>
+        <button id="mock-fail" type="button" class="inline-flex items-center justify-center text-center font-semibold transition-out text-base px-5 py-3.5 rounded-md bg-white text-cyan-600 border border-cyan ring-1 ring-cyan/30 hover:bg-cyan-50">Αποτυχία πληρωμής</button>
       </div>
     </div>
   </Section>
