@@ -130,3 +130,15 @@ export async function listBookings(): Promise<BookingDoc[]> {
   const snap = await adminDb().collection(COLLECTION).orderBy('createdAt', 'desc').get();
   return snap.docs.map((d) => fromDoc(d as QueryDocumentSnapshot));
 }
+
+export async function updateBooking(id: string, fields: Partial<Pick<BookingDoc, 'status' | 'paymentRef'>>): Promise<void> {
+  const update: Record<string, unknown> = {};
+  if (fields.status !== undefined) update.status = fields.status;
+  if (fields.paymentRef !== undefined) update.paymentRef = fields.paymentRef;
+  if (Object.keys(update).length === 0) return;
+  await adminDb().collection(COLLECTION).doc(id).update(update);
+}
+
+export async function deleteBooking(id: string): Promise<void> {
+  await adminDb().collection(COLLECTION).doc(id).delete();
+}
