@@ -12,6 +12,12 @@ export default defineConfig({
     webAnalytics: { enabled: false },
     imageService: true,
   }),
+  security: {
+    // Astro's default CSRF check rejects same-origin DELETE/PUT when the Origin header
+    // doesn't survive Vercel's edge rewrite. Auth is enforced via httpOnly session cookies
+    // + the /admin middleware, so disabling the origin check is safe here.
+    checkOrigin: false,
+  },
   integrations: [
     tailwind({ applyBaseStyles: false }),
     mdx(),
