@@ -1,0 +1,128 @@
+---
+import { getCollection } from 'astro:content';
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import Button from '../../../components/ui/Button.astro';
+
+const programs = (await getCollection('programs')).sort((a, b) => a.data.order - b.data.order);
+
+// JSON for the client-side autofill of priceEur + durationHours when program changes
+const programData: Record<string, { priceEur: number; durationHours: number }> = {};
+programs.forEach((p) => {
+  programData[p.slug] = {
+    priceEur: p.data.priceEur ?? 0,
+    durationHours: Number(p.data.durationHours) || 0,
+  };
+});
+---
+<AdminLayout title="Νέα ημερομηνία">
+  <div class="mb-6">
+    <a href="/admin/sessions/" class="text-sm text-cyan-700 hover:text-crimson font-semibold no-underline">← Επιστροφή</a>
+    <h1 class="mt-2 font-display font-bold text-crimson text-3xl">Νέα ημερομηνία σεμιναρίου</h1>
+  </div>
+
+  <form id="session-form" class="bg-white rounded-2xl border border-hairline shadow-tile p-6 md:p-8 space-y-5 max-w-3xl">
+    <div>
+      <label for="programSlug" class="block text-sm font-semibold text-ink-edge">Σεμινάριο *</label>
+      <select id="programSlug" name="programSlug" required class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20">
+        <option value="">— Επιλέξτε σεμινάριο —</option>
+        {programs.map((p) => (
+          <option value={p.slug}>{p.data.titleEl} ({p.data.code})</option>
+        ))}
+      </select>
+    </div>
+
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label for="startsAt" class="block text-sm font-semibold text-ink-edge">Ημερομηνία &amp; ώρα *</label>
+        <input id="startsAt" name="startsAt" type="datetime-local" required class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20"/>
+        <p class="mt-1 text-xs text-ink-muted">Ώρα Ελλάδας (Europe/Athens)</p>
+      </div>
+      <div>
+        <label for="durationHours" class="block text-sm font-semibold text-ink-edge">Διάρκεια (ώρες) *</label>
+        <input id="durationHours" name="durationHours" type="number" min="1" step="0.5" required class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20"/>
+      </div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label for="capacity" class="block text-sm font-semibold text-ink-edge">Χωρητικότητα</label>
+        <input id="capacity" name="capacity" type="number" min="1" class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20" placeholder="Άφησε κενό για απεριόριστη"/>
+      </div>
+      <div>
+        <label for="priceEur" class="block text-sm font-semibold text-ink-edge">Τιμή / άτομο (€) *</label>
+        <input id="priceEur" name="priceEur" type="number" min="0" step="1" required class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20"/>
+      </div>
+    </div>
+
+    <div>
+      <label for="location" class="block text-sm font-semibold text-ink-edge">Τοποθεσία *</label>
+      <input id="location" name="location" type="text" required class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20" placeholder="π.χ. First Aid Academy, Θεσσαλονίκη"/>
+    </div>
+
+    <div>
+      <label for="status" class="block text-sm font-semibold text-ink-edge">Κατάσταση *</label>
+      <select id="status" name="status" required class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20">
+        <option value="scheduled" selected>Προγραμματισμένο</option>
+        <option value="cancelled">Ακυρωμένο</option>
+        <option value="completed">Ολοκληρωμένο</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="notes" class="block text-sm font-semibold text-ink-edge">Σημειώσεις</label>
+      <textarea id="notes" name="notes" rows="3" class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20" placeholder="Εσωτερικές σημειώσεις (δεν εμφανίζονται δημόσια)"></textarea>
+    </div>
+
+    <p id="form-error" class="hidden text-sm text-crimson font-semibold" role="alert"></p>
+
+    <div class="flex items-center gap-3 pt-2">
+      <Button type="submit" variant="primary" size="md">Αποθήκευση</Button>
+      <a href="/admin/sessions/" class="text-sm font-semibold text-ink-edge hover:text-crimson no-underline">Ακύρωση</a>
+    </div>
+  </form>
+
+  <script is:inline define:vars={{ programData }}>
+    const form = document.getElementById('session-form');
+    const errEl = document.getElementById('form-error');
+    const programSel = document.getElementById('programSlug');
+    const durationEl = document.getElementById('durationHours');
+    const priceEl = document.getElementById('priceEur');
+
+    // Autofill price + duration from selected program
+    programSel.addEventListener('change', () => {
+      const data = programData[programSel.value];
+      if (data) {
+        if (!durationEl.value) durationEl.value = String(data.durationHours);
+        if (!priceEl.value) priceEl.value = String(data.priceEur);
+      }
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errEl.classList.add('hidden');
+      const fd = new FormData(form);
+      const body = {
+        programSlug: fd.get('programSlug'),
+        startsAt: fd.get('startsAt'),
+        durationHours: Number(fd.get('durationHours')),
+        capacity: fd.get('capacity') ? Number(fd.get('capacity')) : null,
+        location: fd.get('location'),
+        priceEur: Number(fd.get('priceEur')),
+        status: fd.get('status'),
+        notes: fd.get('notes') || null,
+      };
+      const res = await fetch('/api/admin/sessions', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        window.location.href = '/admin/sessions/';
+      } else {
+        const data = await res.json().catch(() => ({}));
+        errEl.textContent = data.error ? `Σφάλμα: ${data.error}` : 'Σφάλμα κατά την αποθήκευση. Δοκιμάστε ξανά.';
+        errEl.classList.remove('hidden');
+      }
+    });
+  </script>
+</AdminLayout>

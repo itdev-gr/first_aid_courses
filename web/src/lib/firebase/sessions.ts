@@ -1,0 +1,110 @@
+import { adminDb } from './admin';
+import { Timestamp } from 'firebase-admin/firestore';
+import type { QueryDocumentSnapshot } from 'firebase-admin/firestore';
+
+export type SessionStatus = 'scheduled' | 'cancelled' | 'completed';
+
+export interface SessionDoc {
+  id: string;
+  programSlug: string;
+  startsAt: Date;
+  durationHours: number;
+  capacity: number | null;
+  location: string;
+  priceEur: number;
+  status: SessionStatus;
+  notes: string | null;
+  createdAt: Date;
+  createdBy: string;
+}
+
+export interface SessionInput {
+  programSlug: string;
+  startsAt: Date;
+  durationHours: number;
+  capacity: number | null;
+  location: string;
+  priceEur: number;
+  status: SessionStatus;
+  notes: string | null;
+}
+
+const COLLECTION = 'sessions';
+
+function fromDoc(snap: QueryDocumentSnapshot): SessionDoc {
+  const data = snap.data();
+  return {
+    id: snap.id,
+    programSlug: data.programSlug,
+    startsAt: data.startsAt.toDate(),
+    durationHours: data.durationHours,
+    capacity: data.capacity ?? null,
+    location: data.location,
+    priceEur: data.priceEur,
+    status: data.status,
+    notes: data.notes ?? null,
+    createdAt: data.createdAt.toDate(),
+    createdBy: data.createdBy,
+  };
+}
+
+export async function listSessions(): Promise<SessionDoc[]> {
+  const snap = await adminDb().collection(COLLECTION).orderBy('startsAt', 'asc').get();
+  return snap.docs.map((d) => fromDoc(d as QueryDocumentSnapshot));
+}
+
+export async function getSession(id: string): Promise<SessionDoc | null> {
+  const snap = await adminDb().collection(COLLECTION).doc(id).get();
+  if (!snap.exists) return null;
+  return fromDoc(snap as QueryDocumentSnapshot);
+}
+
+export async function createSession(input: SessionInput, adminUid: string): Promise<string> {
+  const ref = await adminDb().collection(COLLECTION).add({
+    programSlug: input.programSlug,
+    startsAt: Timestamp.fromDate(input.startsAt),
+    durationHours: input.durationHours,
+    capacity: input.capacity,
+    location: input.location,
+    priceEur: input.priceEur,
+    status: input.status,
+    notes: input.notes,
+    createdAt: Timestamp.now(),
+    createdBy: adminUid,
+  });
+  return ref.id;
+}
+
+export async function updateSession(id: string, input: Partial<SessionInput>): Promise<void> {
+  const update: Record<string, unknown> = { ...input };
+  if (input.startsAt instanceof Date) {
+    update.startsAt = Timestamp.fromDate(input.startsAt);
+  }
+  await adminDb().collection(COLLECTION).doc(id).update(update);
+}
+
+export async function deleteSession(id: string): Promise<void> {
+  await adminDb().collection(COLLECTION).doc(id).delete();
+}
+
+/** Format a Date as 'YYYY-MM-DDTHH:MM' in Europe/Athens for <input type="datetime-local">. */
+export function toAthensInputValue(date: Date): string {
+  const fmt = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Athens',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hour12: false,
+  });
+  const parts = fmt.formatToParts(date);
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '';
+  return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}`;
+}
+
+/** Format a Date for display in Greek (Athens time). */
+export function formatAthensDisplay(date: Date): string {
+  return new Intl.DateTimeFormat('el-GR', {
+    timeZone: 'Europe/Athens',
+    weekday: 'short',
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  }).format(date);
+}

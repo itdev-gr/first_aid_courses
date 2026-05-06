@@ -1,0 +1,99 @@
+---
+import { getCollection } from 'astro:content';
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import Button from '../../../components/ui/Button.astro';
+import { listSessions, formatAthensDisplay, type SessionStatus } from '../../../lib/firebase/sessions';
+
+const programs = await getCollection('programs');
+const programByslug: Record<string, { titleEl: string; code: string }> = {};
+programs.forEach((p) => { programByslug[p.slug] = { titleEl: p.data.titleEl, code: p.data.code }; });
+
+const sessions = await listSessions();
+
+const statusLabel: Record<SessionStatus, string> = {
+  scheduled: 'Προγραμματισμένο',
+  cancelled: 'Ακυρωμένο',
+  completed: 'Ολοκληρωμένο',
+};
+const statusColor: Record<SessionStatus, string> = {
+  scheduled: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+  cancelled: 'bg-red-50 text-red-700 border border-red-200',
+  completed: 'bg-slate-100 text-slate-700 border border-slate-200',
+};
+---
+<AdminLayout title="Ημερομηνίες">
+  <div class="flex items-end justify-between gap-4 mb-6">
+    <div>
+      <h1 class="font-display font-bold text-crimson text-3xl">Ημερομηνίες σεμιναρίων</h1>
+      <p class="mt-2 text-ink-muted">Διαχείριση των διαθέσιμων ημερομηνιών για τα σεμινάρια.</p>
+    </div>
+    <Button href="/admin/sessions/new" variant="primary" size="md">+ Νέα ημερομηνία</Button>
+  </div>
+
+  {sessions.length === 0 ? (
+    <div class="bg-white rounded-2xl border border-hairline shadow-tile p-10 text-center">
+      <p class="text-ink-muted">Δεν υπάρχουν ακόμη ημερομηνίες.</p>
+      <p class="mt-1 text-ink-muted text-sm">Πατήστε «Νέα ημερομηνία» για να προσθέσετε την πρώτη.</p>
+    </div>
+  ) : (
+    <div class="bg-white rounded-2xl border border-hairline shadow-tile overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="bg-surface-cyan text-ink-strong text-left">
+              <th class="text-xs uppercase tracking-wider font-semibold px-5 py-3">Σεμινάριο</th>
+              <th class="text-xs uppercase tracking-wider font-semibold px-5 py-3">Ημερομηνία</th>
+              <th class="text-xs uppercase tracking-wider font-semibold px-5 py-3">Διάρκεια</th>
+              <th class="text-xs uppercase tracking-wider font-semibold px-5 py-3">Χωρητικότητα</th>
+              <th class="text-xs uppercase tracking-wider font-semibold px-5 py-3">Τοποθεσία</th>
+              <th class="text-xs uppercase tracking-wider font-semibold px-5 py-3">Τιμή</th>
+              <th class="text-xs uppercase tracking-wider font-semibold px-5 py-3">Κατάσταση</th>
+              <th class="text-xs uppercase tracking-wider font-semibold px-5 py-3 text-right">Ενέργειες</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sessions.map((s) => {
+              const prog = programByslug[s.programSlug];
+              return (
+                <tr class="border-t border-hairline hover:bg-surface-soft/50">
+                  <td class="px-5 py-4">
+                    <p class="font-semibold text-ink-strong">{prog?.titleEl ?? s.programSlug}</p>
+                    <p class="text-xs text-ink-muted">{prog?.code ?? s.programSlug}</p>
+                  </td>
+                  <td class="px-5 py-4 text-ink whitespace-nowrap">{formatAthensDisplay(s.startsAt)}</td>
+                  <td class="px-5 py-4 text-ink-muted">{s.durationHours} ώρες</td>
+                  <td class="px-5 py-4 text-ink-muted">{s.capacity ?? '—'}</td>
+                  <td class="px-5 py-4 text-ink-muted">{s.location}</td>
+                  <td class="px-5 py-4 font-display font-bold text-crimson">€{s.priceEur}</td>
+                  <td class="px-5 py-4">
+                    <span class={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusColor[s.status]}`}>{statusLabel[s.status]}</span>
+                  </td>
+                  <td class="px-5 py-4 text-right whitespace-nowrap">
+                    <a href={`/admin/sessions/${s.id}`} class="text-cyan-700 hover:text-crimson font-semibold text-sm">Επεξεργασία</a>
+                    <button type="button" data-delete-session={s.id} data-delete-label={`${prog?.titleEl ?? s.programSlug} — ${formatAthensDisplay(s.startsAt)}`} class="ml-3 text-red-600 hover:text-red-800 font-semibold text-sm">Διαγραφή</button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )}
+
+  <script>
+    document.querySelectorAll<HTMLButtonElement>('[data-delete-session]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.deleteSession!;
+        const label = btn.dataset.deleteLabel ?? id;
+        if (!confirm(`Διαγραφή ημερομηνίας;\n\n${label}\n\nΗ ενέργεια δεν μπορεί να αναιρεθεί.`)) return;
+        const res = await fetch(`/api/admin/sessions/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          window.location.reload();
+        } else {
+          alert('Σφάλμα κατά τη διαγραφή. Δοκιμάστε ξανά.');
+        }
+      });
+    });
+  </script>
+</AdminLayout>

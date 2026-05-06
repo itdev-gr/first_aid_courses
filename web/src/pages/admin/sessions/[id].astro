@@ -1,0 +1,126 @@
+---
+import { getCollection } from 'astro:content';
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import Button from '../../../components/ui/Button.astro';
+import { getSession, toAthensInputValue } from '../../../lib/firebase/sessions';
+
+const id = Astro.params.id!;
+const session = await getSession(id);
+if (!session) {
+  return Astro.redirect('/admin/sessions/?missing=1', 302);
+}
+
+const programs = (await getCollection('programs')).sort((a, b) => a.data.order - b.data.order);
+const startsAtValue = toAthensInputValue(session.startsAt);
+---
+<AdminLayout title="Επεξεργασία ημερομηνίας">
+  <div class="mb-6">
+    <a href="/admin/sessions/" class="text-sm text-cyan-700 hover:text-crimson font-semibold no-underline">← Επιστροφή</a>
+    <h1 class="mt-2 font-display font-bold text-crimson text-3xl">Επεξεργασία ημερομηνίας</h1>
+    <p class="mt-1 text-xs text-ink-muted">ID: <code>{session.id}</code> · Δημιουργήθηκε από {session.createdBy}</p>
+  </div>
+
+  <form id="session-form" data-id={session.id} class="bg-white rounded-2xl border border-hairline shadow-tile p-6 md:p-8 space-y-5 max-w-3xl">
+    <div>
+      <label for="programSlug" class="block text-sm font-semibold text-ink-edge">Σεμινάριο *</label>
+      <select id="programSlug" name="programSlug" required class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20">
+        {programs.map((p) => (
+          <option value={p.slug} selected={p.slug === session.programSlug}>{p.data.titleEl} ({p.data.code})</option>
+        ))}
+      </select>
+    </div>
+
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label for="startsAt" class="block text-sm font-semibold text-ink-edge">Ημερομηνία &amp; ώρα *</label>
+        <input id="startsAt" name="startsAt" type="datetime-local" required value={startsAtValue} class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20"/>
+        <p class="mt-1 text-xs text-ink-muted">Ώρα Ελλάδας (Europe/Athens)</p>
+      </div>
+      <div>
+        <label for="durationHours" class="block text-sm font-semibold text-ink-edge">Διάρκεια (ώρες) *</label>
+        <input id="durationHours" name="durationHours" type="number" min="1" step="0.5" required value={session.durationHours} class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20"/>
+      </div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label for="capacity" class="block text-sm font-semibold text-ink-edge">Χωρητικότητα</label>
+        <input id="capacity" name="capacity" type="number" min="1" value={session.capacity ?? ''} class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20" placeholder="Άφησε κενό για απεριόριστη"/>
+      </div>
+      <div>
+        <label for="priceEur" class="block text-sm font-semibold text-ink-edge">Τιμή / άτομο (€) *</label>
+        <input id="priceEur" name="priceEur" type="number" min="0" step="1" required value={session.priceEur} class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20"/>
+      </div>
+    </div>
+
+    <div>
+      <label for="location" class="block text-sm font-semibold text-ink-edge">Τοποθεσία *</label>
+      <input id="location" name="location" type="text" required value={session.location} class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20"/>
+    </div>
+
+    <div>
+      <label for="status" class="block text-sm font-semibold text-ink-edge">Κατάσταση *</label>
+      <select id="status" name="status" required class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20">
+        <option value="scheduled" selected={session.status === 'scheduled'}>Προγραμματισμένο</option>
+        <option value="cancelled" selected={session.status === 'cancelled'}>Ακυρωμένο</option>
+        <option value="completed" selected={session.status === 'completed'}>Ολοκληρωμένο</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="notes" class="block text-sm font-semibold text-ink-edge">Σημειώσεις</label>
+      <textarea id="notes" name="notes" rows="3" class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20" placeholder="Εσωτερικές σημειώσεις (δεν εμφανίζονται δημόσια)">{session.notes ?? ''}</textarea>
+    </div>
+
+    <p id="form-error" class="hidden text-sm text-crimson font-semibold" role="alert"></p>
+
+    <div class="flex items-center justify-between gap-3 pt-2">
+      <div class="flex items-center gap-3">
+        <Button type="submit" variant="primary" size="md">Αποθήκευση</Button>
+        <a href="/admin/sessions/" class="text-sm font-semibold text-ink-edge hover:text-crimson no-underline">Ακύρωση</a>
+      </div>
+      <button type="button" id="delete-btn" class="text-red-600 hover:text-red-800 font-semibold text-sm">Διαγραφή ημερομηνίας</button>
+    </div>
+  </form>
+
+  <script>
+    const form = document.getElementById('session-form') as HTMLFormElement;
+    const errEl = document.getElementById('form-error') as HTMLElement;
+    const id = form.dataset.id!;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errEl.classList.add('hidden');
+      const fd = new FormData(form);
+      const body = {
+        programSlug: fd.get('programSlug'),
+        startsAt: fd.get('startsAt'),
+        durationHours: Number(fd.get('durationHours')),
+        capacity: fd.get('capacity') ? Number(fd.get('capacity')) : null,
+        location: fd.get('location'),
+        priceEur: Number(fd.get('priceEur')),
+        status: fd.get('status'),
+        notes: fd.get('notes') || null,
+      };
+      const res = await fetch(`/api/admin/sessions/${id}`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        window.location.href = '/admin/sessions/';
+      } else {
+        const data = await res.json().catch(() => ({}));
+        errEl.textContent = (data as { error?: string }).error ? `Σφάλμα: ${(data as { error?: string }).error}` : 'Σφάλμα κατά την αποθήκευση.';
+        errEl.classList.remove('hidden');
+      }
+    });
+
+    document.getElementById('delete-btn')?.addEventListener('click', async () => {
+      if (!confirm('Διαγραφή αυτής της ημερομηνίας; Η ενέργεια δεν μπορεί να αναιρεθεί.')) return;
+      const res = await fetch(`/api/admin/sessions/${id}`, { method: 'DELETE' });
+      if (res.ok) window.location.href = '/admin/sessions/';
+      else alert('Σφάλμα κατά τη διαγραφή.');
+    });
+  </script>
+</AdminLayout>
