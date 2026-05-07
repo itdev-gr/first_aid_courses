@@ -13,7 +13,7 @@ const clients = (await getCollection('clients')).sort((a, b) => a.data.name.loca
   <ul class="mt-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-8 gap-y-10 items-center">
     {clients.map((c) => (
       <li class="flex justify-center" title={c.data.name}>
-        <Image src={c.data.logo} alt={c.data.name} widths={[160, 240]} sizes="160px" class="max-h-20 w-auto object-contain grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-out" />
+        <Image src={c.data.logo} alt={c.data.name} widths={[200, 320]} sizes="200px" class="max-h-28 w-auto object-contain grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-out" />
       </li>
     ))}
   </ul>
