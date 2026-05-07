@@ -6,7 +6,7 @@ import mdx from '@astrojs/mdx';
 import vercel from '@astrojs/vercel';
 
 export default defineConfig({
-  site: 'https://firstaidacademy.gr',
+  site: 'https://www.firstaid-academy.gr',
   output: 'server',
   adapter: vercel({
     webAnalytics: { enabled: false },
@@ -21,7 +21,17 @@ export default defineConfig({
   integrations: [
     tailwind({ applyBaseStyles: false }),
     mdx(),
-    sitemap(),
+    sitemap({
+      // Keep admin, API, and internal payment-flow pages out of the sitemap.
+      // Search engines and AI crawlers should not surface these.
+      filter: (page) =>
+        !page.includes('/admin/') &&
+        !page.includes('/api/') &&
+        !page.includes('/kratisi/mock-pay') &&
+        !page.includes('/kratisi/paid') &&
+        !page.includes('/kratisi/payment-failed') &&
+        !page.includes('/kratisi/success'),
+    }),
   ],
   build: { inlineStylesheets: 'auto' },
   image: { service: { entrypoint: 'astro/assets/services/sharp' } },

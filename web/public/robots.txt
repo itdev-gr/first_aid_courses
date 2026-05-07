@@ -1,0 +1,100 @@
+# First Aid Academy — robots.txt
+# https://www.firstaid-academy.gr/
+
+# Default rule for all crawlers (search engines + bots)
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /admin
+Disallow: /api/
+Disallow: /api
+Disallow: /kratisi/mock-pay
+Disallow: /kratisi/paid
+Disallow: /kratisi/payment-failed
+Disallow: /kratisi/success
+Disallow: /*?id=
+Disallow: /*?program=*&type=
+Disallow: /404
+
+# AI search assistants — explicitly welcomed
+User-agent: GPTBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: CCBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Bytespider
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Meta-ExternalAgent
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: facebookexternalhit
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Sitemap & AI summary
+Sitemap: https://www.firstaid-academy.gr/sitemap-index.xml
+
+# llms.txt — AI-readable site summary (https://llmstxt.org)
+# https://www.firstaid-academy.gr/llms.txt
+# https://www.firstaid-academy.gr/llms-full.txt

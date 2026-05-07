@@ -8,7 +8,7 @@ export interface SeoProps {
 }
 
 export const siteName = 'First Aid Academy';
-export const siteUrl  = 'https://firstaidacademy.gr';
+export const siteUrl  = 'https://www.firstaid-academy.gr';
 export const defaultOg = '/og-default.jpg';
 
 export const buildTitle = (page: string) =>
