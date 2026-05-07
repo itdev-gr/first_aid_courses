@@ -48,14 +48,6 @@
   }
 }
 
-/*
- * cbl.link <button-tool-widget> stacking is handled by JS in BaseLayout
- * (script reaches into shadow DOM to override inline `bottom` on the
- * inner fixed button). CSS-only attempts via `transform` on the host
- * break position:fixed semantics — the inner button gets anchored to
- * the host's document position instead of the viewport.
- */
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
