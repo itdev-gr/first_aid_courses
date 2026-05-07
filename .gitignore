@@ -31,3 +31,8 @@ firebase-admin-key.json
 /cofat-*.jpeg
 /live-*.jpeg
 /live-*.png
+/phase[0-9]-*.png
+/phase[0-9]-*.jpeg
+/banner-*.png
+/banner-*.jpeg
+.vercel
