@@ -49,24 +49,12 @@
 }
 
 /*
- * Floating-button stack at bottom-right (Viber widgets + custom WhatsApp).
- *
- * cbl.link <button-tool-widget> custom elements render an inner button
- * with position:fixed; bottom:20px; right:20px. Without intervention,
- * every widget lands at the same spot. Setting `transform` on the host
- * creates a new containing block, re-anchoring the inner fixed button.
- *
- * Stack order (bottom → top of viewport):
- *   1. WhatsAppFloater (.whatsapp-floater) — bottom: 20px (default)
- *   2. First Viber widget — shifted up 72px → bottom: 92px
- *   3. Second Viber widget — shifted up 144px → bottom: 164px
+ * cbl.link <button-tool-widget> stacking is handled by JS in BaseLayout
+ * (script reaches into shadow DOM to override inline `bottom` on the
+ * inner fixed button). CSS-only attempts via `transform` on the host
+ * break position:fixed semantics — the inner button gets anchored to
+ * the host's document position instead of the viewport.
  */
-button-tool-widget:nth-of-type(1) {
-  transform: translateY(-96px);
-}
-button-tool-widget:nth-of-type(2) {
-  transform: translateY(-192px);
-}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

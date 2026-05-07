@@ -57,6 +57,32 @@ const ogUrl     = new URL(ogImage, siteUrl).toString();
         s.async = true;
         document.head.appendChild(s);
       })();
+
+      // Stack the cbl.link Viber widgets above the WhatsApp floater
+      // (which sits at bottom: 20px). Each widget's inner button is
+      // position:fixed inside an open shadow root; we override its bottom.
+      (function() {
+        var WHATSAPP_BOTTOM = 20;
+        var BUTTON_HEIGHT = 56;
+        var GAP = 18;
+        function step(i) { return WHATSAPP_BOTTOM + (i + 1) * (BUTTON_HEIGHT + GAP); }
+        function shiftWidgets() {
+          var hosts = document.querySelectorAll('button-tool-widget');
+          hosts.forEach(function(host, i) {
+            if (!host.shadowRoot) return;
+            var inner = host.shadowRoot.querySelector('.box-border');
+            if (!inner) return;
+            inner.style.setProperty('bottom', step(i) + 'px', 'important');
+          });
+          return hosts.length;
+        }
+        var tries = 0;
+        var iv = setInterval(function() {
+          tries += 1;
+          var n = shiftWidgets();
+          if (n >= 2 || tries > 50) clearInterval(iv);
+        }, 200);
+      })();
     </script>
   </head>
   <body class="bg-white text-ink min-h-screen flex flex-col">
