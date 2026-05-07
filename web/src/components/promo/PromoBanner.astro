@@ -1,0 +1,77 @@
+---
+// web/src/components/promo/PromoBanner.astro
+//
+// Sticky promo for the «Νταντάδες της Γειτονιάς» program.
+// Behavior: position:sticky bottom:0 — floats at viewport bottom while
+// scrolling, parks at its natural slot above the footer when reached.
+// Dismiss persists in localStorage for 30 days.
+
+const STORAGE_KEY = 'promo:ntantades-2026';
+const DISMISS_DAYS = 30;
+---
+<aside
+  id="promo-ntantades"
+  data-storage-key={STORAGE_KEY}
+  data-dismiss-days={DISMISS_DAYS}
+  class="sticky bottom-0 z-30 hidden bg-crimson text-white shadow-[0_-8px_24px_-12px_rgba(15,23,42,0.4)]"
+  aria-label="Πρόγραμμα Νταντάδες της Γειτονιάς"
+>
+  <div class="container-x py-3 md:py-4 flex items-center gap-4">
+    <div class="flex-1 min-w-0 flex flex-wrap items-center gap-x-3 gap-y-1">
+      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-white/15 border border-white/30 whitespace-nowrap">
+        Νέο πρόγραμμα
+      </span>
+      <p class="font-display font-bold text-base md:text-lg leading-tight">
+        Νταντάδες της Γειτονιάς:
+        <span class="font-normal opacity-95">απαιτείται πιστοποιητικό Παιδιατρικών Πρώτων Βοηθειών.</span>
+      </p>
+    </div>
+    <a
+      href="/seminaria/pfa/"
+      class="hidden sm:inline-flex shrink-0 items-center gap-1.5 bg-white text-crimson font-semibold rounded-md px-4 py-2 text-sm hover:bg-white/90 transition-out no-underline"
+    >
+      Δείτε το σεμινάριο
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+    <a
+      href="/seminaria/pfa/"
+      class="inline-flex sm:hidden shrink-0 bg-white text-crimson font-semibold rounded-md px-3 py-2 text-sm no-underline"
+      aria-label="Δείτε το σεμινάριο Παιδιατρικών Πρώτων Βοηθειών"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+    <button
+      type="button"
+      id="promo-ntantades-close"
+      aria-label="Κλείσιμο"
+      class="shrink-0 -mr-1 w-8 h-8 rounded-full text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition-out"
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+</aside>
+
+<script>
+  const banner = document.getElementById('promo-ntantades') as HTMLElement | null;
+  const closeBtn = document.getElementById('promo-ntantades-close');
+  if (banner) {
+    const key = banner.dataset.storageKey ?? 'promo:ntantades-2026';
+    const days = Number(banner.dataset.dismissDays ?? '30');
+    const ttlMs = days * 24 * 60 * 60 * 1000;
+    let dismissed = false;
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const at = Number(raw);
+        if (Number.isFinite(at) && Date.now() - at < ttlMs) dismissed = true;
+      }
+    } catch { /* ignore — Safari private mode */ }
+
+    if (!dismissed) banner.classList.remove('hidden');
+
+    closeBtn?.addEventListener('click', () => {
+      try { localStorage.setItem(key, String(Date.now())); } catch { /* ignore */ }
+      banner.classList.add('hidden');
+    });
+  }
+</script>
