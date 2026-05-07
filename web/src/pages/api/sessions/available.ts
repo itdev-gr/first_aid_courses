@@ -19,6 +19,7 @@ export const GET: APIRoute = async ({ url }) => {
       capacity: s.capacity,
       location: s.location,
       priceEur: s.priceEur,
+      notes: s.notes,
     }));
     return new Response(JSON.stringify({ sessions: payload }), {
       status: 200,

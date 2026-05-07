@@ -51,6 +51,12 @@ const minutesUntilExpiry = booking
                 <span class="text-sm font-semibold text-ink-strong">{session.location}</span>
               </div>
             )}
+            {session?.notes && (
+              <div class="pt-3 border-t border-hairline">
+                <p class="text-xs font-semibold uppercase tracking-wider text-cyan-700">Σημειώσεις σεμιναρίου</p>
+                <p class="mt-1 text-sm text-ink leading-relaxed whitespace-pre-line">{session.notes}</p>
+              </div>
+            )}
             <div class="flex justify-between gap-4">
               <span class="text-sm text-ink-muted">Συμμετέχοντες</span>
               <span class="text-sm font-semibold text-ink-strong">{booking.participantCount}</span>

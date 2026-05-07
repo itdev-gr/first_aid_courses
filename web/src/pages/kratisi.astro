@@ -15,7 +15,7 @@ const initialProgram = url.searchParams.get('program') ?? '';
 const initialType = url.searchParams.get('type') === 'business' ? 'business' : 'individual';
 
 // Pre-fetch available sessions for the initially-selected program (server-side)
-let initialSessions: Array<{ id: string; label: string; priceEur: number; capacity: number | null }> = [];
+let initialSessions: Array<{ id: string; label: string; priceEur: number; capacity: number | null; notes: string | null }> = [];
 if (initialProgram && programs.some((p) => p.slug === initialProgram)) {
   try {
     const list = await listAvailableForProgram(initialProgram);
@@ -24,6 +24,7 @@ if (initialProgram && programs.some((p) => p.slug === initialProgram)) {
       label: `${formatAthensDisplay(s.startsAt)} · ${s.location}${s.capacity != null ? ` · ${s.capacity} θέσεις` : ''}`,
       priceEur: s.priceEur,
       capacity: s.capacity,
+      notes: s.notes,
     }));
   } catch {
     initialSessions = [];
@@ -82,12 +83,16 @@ if (initialProgram && programs.some((p) => p.slug === initialProgram)) {
                 <>
                   <option value="">— Επιλέξτε ημερομηνία —</option>
                   {initialSessions.map((s) => (
-                    <option value={s.id} data-price={s.priceEur}>{s.label}</option>
+                    <option value={s.id} data-price={s.priceEur} data-notes={s.notes ?? ''}>{s.label}</option>
                   ))}
                 </>
               )}
             </select>
             <p id="session-help" class="mt-1 text-xs text-ink-muted hidden">Δεν βρίσκετε ημερομηνία που να σας βολεύει; <a href="/epikoinonia/" class="text-cyan-700 font-semibold no-underline">Επικοινωνήστε μαζί μας</a> για ιδιωτικό σεμινάριο.</p>
+            <div id="session-notes" class="mt-3 hidden bg-surface-cyan border border-cyan/30 rounded-xl p-4 text-sm text-ink leading-relaxed" role="note">
+              <p class="text-xs font-semibold uppercase tracking-wider text-cyan-700 mb-1">Σημειώσεις σεμιναρίου</p>
+              <p id="session-notes-text" class="whitespace-pre-line"></p>
+            </div>
           </div>
 
           <div class="grid sm:grid-cols-2 gap-4">
@@ -163,11 +168,24 @@ if (initialProgram && programs.some((p) => p.slug === initialProgram)) {
     const programSel = document.getElementById('programSlug') as HTMLSelectElement;
     const sessionSel = document.getElementById('sessionId') as HTMLSelectElement;
     const sessionHelp = document.getElementById('session-help') as HTMLElement;
+    const sessionNotesBox = document.getElementById('session-notes') as HTMLElement;
+    const sessionNotesText = document.getElementById('session-notes-text') as HTMLElement;
     const participantInput = document.getElementById('participantCount') as HTMLInputElement;
     const totalDisplay = document.getElementById('total-display') as HTMLElement;
     const totalCount = document.getElementById('total-count') as HTMLElement;
     const totalAmount = document.getElementById('total-amount') as HTMLElement;
     const errEl = document.getElementById('form-error') as HTMLElement;
+
+    function updateNotes() {
+      const opt = sessionSel.options[sessionSel.selectedIndex];
+      const notes = opt?.dataset.notes ?? '';
+      if (notes && opt?.value) {
+        sessionNotesText.textContent = notes;
+        sessionNotesBox.classList.remove('hidden');
+      } else {
+        sessionNotesBox.classList.add('hidden');
+      }
+    }
 
     function updateTotal() {
       const opt = sessionSel.options[sessionSel.selectedIndex];
@@ -187,7 +205,7 @@ if (initialProgram && programs.some((p) => p.slug === initialProgram)) {
       sessionSel.innerHTML = '<option value="">— Φόρτωση… —</option>';
       try {
         const res = await fetch(`/api/sessions/available?program=${encodeURIComponent(programSlug)}`);
-        const data = await res.json() as { sessions?: Array<{ id: string; startsAt: string; location: string; capacity: number | null; priceEur: number }> };
+        const data = await res.json() as { sessions?: Array<{ id: string; startsAt: string; location: string; capacity: number | null; priceEur: number; notes: string | null }> };
         const sessions = data.sessions ?? [];
         if (sessions.length === 0) {
           sessionSel.innerHTML = '<option value="">— Δεν υπάρχουν διαθέσιμες ημερομηνίες αυτή τη στιγμή —</option>';
@@ -198,9 +216,11 @@ if (initialProgram && programs.some((p) => p.slug === initialProgram)) {
             timeZone: 'Europe/Athens',
             weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
           });
+          const escAttr = (v: string) => v.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
           sessionSel.innerHTML = '<option value="">— Επιλέξτε ημερομηνία —</option>' + sessions.map((s) => {
             const label = `${fmt.format(new Date(s.startsAt))} · ${s.location}${s.capacity != null ? ` · ${s.capacity} θέσεις` : ''}`;
-            return `<option value="${s.id}" data-price="${s.priceEur}">${label}</option>`;
+            const notesAttr = s.notes ? ` data-notes="${escAttr(s.notes)}"` : '';
+            return `<option value="${s.id}" data-price="${s.priceEur}"${notesAttr}>${label}</option>`;
           }).join('');
           sessionSel.disabled = false;
         }
@@ -208,6 +228,7 @@ if (initialProgram && programs.some((p) => p.slug === initialProgram)) {
         sessionSel.innerHTML = '<option value="">— Σφάλμα φόρτωσης —</option>';
       }
       updateTotal();
+      updateNotes();
     }
 
     programSel.addEventListener('change', () => {
@@ -217,11 +238,16 @@ if (initialProgram && programs.some((p) => p.slug === initialProgram)) {
         sessionSel.disabled = true;
         sessionHelp.classList.add('hidden');
         updateTotal();
+        updateNotes();
       }
     });
-    sessionSel.addEventListener('change', updateTotal);
+    sessionSel.addEventListener('change', () => {
+      updateTotal();
+      updateNotes();
+    });
     participantInput.addEventListener('input', updateTotal);
     updateTotal();
+    updateNotes();
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();

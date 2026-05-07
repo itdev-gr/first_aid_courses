@@ -69,7 +69,8 @@ const startsAtValue = toAthensInputValue(session.startsAt);
 
     <div>
       <label for="notes" class="block text-sm font-semibold text-ink-edge">Σημειώσεις</label>
-      <textarea id="notes" name="notes" rows="3" class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20" placeholder="Εσωτερικές σημειώσεις (δεν εμφανίζονται δημόσια)">{session.notes ?? ''}</textarea>
+      <textarea id="notes" name="notes" rows="3" class="mt-2 w-full rounded-md border border-hairline bg-white px-4 py-3 text-ink focus:border-crimson focus:ring-2 focus:ring-crimson/20" placeholder="Π.χ. Φέρτε άνετα ρούχα, στάθμευση δωρεάν στον χώρο…">{session.notes ?? ''}</textarea>
+      <p class="mt-1 text-xs text-ink-muted">Εμφανίζεται στον πελάτη όταν επιλέγει αυτή την ημερομηνία στη φόρμα κράτησης.</p>
     </div>
 
     <p id="form-error" class="hidden text-sm text-crimson font-semibold" role="alert"></p>
