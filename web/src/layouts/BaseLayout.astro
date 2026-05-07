@@ -52,31 +52,9 @@ const ogUrl     = new URL(ogImage, siteUrl).toString();
         document.head.appendChild(s);
       })();
 
-      // Stack the cbl.link Viber widget above the WhatsApp floater
-      // (which sits at bottom: 20px). The widget's inner button is
-      // position:fixed inside an open shadow root; we override its bottom.
-      (function() {
-        var WHATSAPP_BOTTOM = 20;
-        var BUTTON_HEIGHT = 56;
-        var GAP = 18;
-        function step(i) { return WHATSAPP_BOTTOM + (i + 1) * (BUTTON_HEIGHT + GAP); }
-        function shiftWidgets() {
-          var hosts = document.querySelectorAll('button-tool-widget');
-          hosts.forEach(function(host, i) {
-            if (!host.shadowRoot) return;
-            var inner = host.shadowRoot.querySelector('.box-border');
-            if (!inner) return;
-            inner.style.setProperty('bottom', step(i) + 'px', 'important');
-          });
-          return hosts.length;
-        }
-        var tries = 0;
-        var iv = setInterval(function() {
-          tries += 1;
-          var n = shiftWidgets();
-          if (n >= 1 || tries > 50) clearInterval(iv);
-        }, 200);
-      })();
+      // Viber (cbl.link widget) stays at its default position (bottom: 20px).
+      // WhatsApp (custom) sits above at bottom: 94px. No JS override needed
+      // — the widget's natural bottom: 20px lines up with the bottom slot.
     </script>
   </head>
   <body class="bg-white text-ink min-h-screen flex flex-col">
