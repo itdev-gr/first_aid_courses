@@ -49,16 +49,23 @@
 }
 
 /*
- * cbl.link chat widgets render as <button-tool-widget> custom elements with
- * Shadow DOM. Their inner button uses position:fixed; bottom:20px; right:20px
- * — so multiple widgets stack on top of each other at the same coordinates.
- * Setting `transform` on the host creates a new containing block, which
- * re-anchors the inner fixed button to the host's transformed position.
- * Result: the second widget shifts up so the two stack vertically instead
- * of overlapping.
+ * Floating-button stack at bottom-right (Viber widgets + custom WhatsApp).
+ *
+ * cbl.link <button-tool-widget> custom elements render an inner button
+ * with position:fixed; bottom:20px; right:20px. Without intervention,
+ * every widget lands at the same spot. Setting `transform` on the host
+ * creates a new containing block, re-anchoring the inner fixed button.
+ *
+ * Stack order (bottom → top of viewport):
+ *   1. WhatsAppFloater (.whatsapp-floater) — bottom: 20px (default)
+ *   2. First Viber widget — shifted up 72px → bottom: 92px
+ *   3. Second Viber widget — shifted up 144px → bottom: 164px
  */
-button-tool-widget:nth-of-type(2) {
+button-tool-widget:nth-of-type(1) {
   transform: translateY(-72px);
+}
+button-tool-widget:nth-of-type(2) {
+  transform: translateY(-144px);
 }
 
 @media (prefers-reduced-motion: reduce) {
