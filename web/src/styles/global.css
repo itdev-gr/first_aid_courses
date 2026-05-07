@@ -48,6 +48,19 @@
   }
 }
 
+/*
+ * cbl.link chat widgets render as <button-tool-widget> custom elements with
+ * Shadow DOM. Their inner button uses position:fixed; bottom:20px; right:20px
+ * — so multiple widgets stack on top of each other at the same coordinates.
+ * Setting `transform` on the host creates a new containing block, which
+ * re-anchors the inner fixed button to the host's transformed position.
+ * Result: the second widget shifts up so the two stack vertically instead
+ * of overlapping.
+ */
+button-tool-widget:nth-of-type(2) {
+  transform: translateY(-72px);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
