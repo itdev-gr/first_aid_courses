@@ -123,9 +123,11 @@ const EVENT_TYPES: Record<number, WebhookPayload['status']> = {
 
 export async function parseWebhook(rawBody: string, _signature: string | null): Promise<WebhookPayload | null> {
   // Viva sends a JSON body with EventData + EventTypeId.
-  // Optional verification: GET /api/messages/config/token returns a Key
-  // that the webhook URL is registered against; for now we trust the body
-  // since Viva only POSTs from known IPs to the URL we provided.
+  // TODO: add HMAC-SHA256 signature verification using VIVA_WEBHOOK_KEY once we
+  // confirm the exact request header Viva uses (docs at developer.viva.com).
+  // Current safeguards: webhook URL is registered against our verification key
+  // (GET handshake), processing is idempotent in markBookingPaid, and only
+  // orderCodes that match an existing pending booking get acted on.
   try {
     const body = JSON.parse(rawBody) as { EventTypeId?: number; EventData?: { OrderCode?: number; TransactionId?: string } };
     const eventTypeId = body.EventTypeId;
